@@ -1,0 +1,14 @@
+--- a/apps/web/src/app/oss-routing.module.ts
++++ b/apps/web/src/app/oss-routing.module.ts
+@@ -715,6 +715,11 @@
+         canActivate: [canAccessFeature(FeatureFlag.VFO1Foundation, true, "/vault")],
+         data: { titleId: "myFolders" } satisfies RouteDataProperties,
+       },
++      {
++        path: "sm",
++        loadComponent: () =>
++          import("./secrets-manager-vw/sm-home.component").then((m) => m.SmHomeComponent),
++      },
+       {
+         path: "sm-landing",
+         component: SMLandingComponent,
