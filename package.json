@@ -1,0 +1,16 @@
+{
+  "name": "vaultwarden-sm-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Overlay build of the Bitwarden web vault with a clean-room Secrets Manager module, served by a companion vaultwarden.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "fetch": "node scripts/build.mjs --fetch-only",
+    "clean": "node scripts/build.mjs --clean"
+  },
+  "engines": {
+    "node": ">=24.17.0"
+  },
+  "license": "GPL-3.0-only"
+}

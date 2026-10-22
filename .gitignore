@@ -1,0 +1,14 @@
+# The upstream bitwarden/clients checkout is fetched at build time, never vendored.
+/.build/
+
+# Claude worktrees live inside the repo; never track them.
+/.claude/worktrees/
+
+# Build output (the static web-vault bundle) and node deps.
+dist/
+node_modules/
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

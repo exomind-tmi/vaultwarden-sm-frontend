@@ -1,0 +1,5 @@
+{
+  "repo": "https://github.com/bitwarden/clients.git",
+  "ref": "web-v2026.10.0",
+  "comment": "Pinned upstream bitwarden/clients tag. Must be recent enough to recognize the 'vfo1-foundation' client feature flag (the fork of vaultwarden enables it via EXPERIMENTAL_CLIENT_FEATURE_FLAGS). Change in lockstep with the web-vault version the companion vaultwarden targets."
+}
