@@ -1,0 +1,16 @@
+diff --git a/apps/web/src/app/layouts/product-switcher/shared/product-switcher.service.ts b/apps/web/src/app/layouts/product-switcher/shared/product-switcher.service.ts
+index ca79179..19b4625 100644
+--- a/apps/web/src/app/layouts/product-switcher/shared/product-switcher.service.ts
++++ b/apps/web/src/app/layouts/product-switcher/shared/product-switcher.service.ts
+@@ -179,9 +179,9 @@ export class ProductSwitcherService {
+ 
+         // If the active route org doesn't have access to SM, find the first org that does.
+         const smOrg =
+-          routeOrg?.canAccessSecretsManager && routeOrg?.enabled == true
++          routeOrg?.enabled == true
+             ? routeOrg
+-            : orgs.find((o) => o.canAccessSecretsManager && o.enabled == true);
++            : orgs.find((o) => o.enabled == true);
+ 
+         // If the active route org doesn't have access to AC, find the first org that does.
+         const acOrg =

@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/app/oss-routing.module.ts b/apps/web/src/app/oss-routing.module.ts
-index 0c5d9b4..216634b 100644
+index 0c5d9b4..6a10a9f 100644
 --- a/apps/web/src/app/oss-routing.module.ts
 +++ b/apps/web/src/app/oss-routing.module.ts
 @@ -674,6 +674,11 @@ const routes: Routes = [
@@ -7,7 +7,7 @@ index 0c5d9b4..216634b 100644
          canDeactivate: [unsavedSendEditsGuard],
        },
 +      {
-+        path: "sm",
++        path: "sm/:organizationId",
 +        loadComponent: () =>
 +          import("./secrets-manager-vw/sm-home.component").then((m) => m.SmHomeComponent),
 +      },
