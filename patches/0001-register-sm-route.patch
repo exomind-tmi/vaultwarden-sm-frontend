@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/app/oss-routing.module.ts b/apps/web/src/app/oss-routing.module.ts
-index 0c5d9b4..6a10a9f 100644
+index 0c5d9b4..a0fc7da 100644
 --- a/apps/web/src/app/oss-routing.module.ts
 +++ b/apps/web/src/app/oss-routing.module.ts
 @@ -674,6 +674,11 @@ const routes: Routes = [
@@ -9,7 +9,7 @@ index 0c5d9b4..6a10a9f 100644
 +      {
 +        path: "sm/:organizationId",
 +        loadComponent: () =>
-+          import("./secrets-manager-vw/sm-home.component").then((m) => m.SmHomeComponent),
++          import("./secrets-manager-vw/projects.component").then((m) => m.ProjectsComponent),
 +      },
        {
          path: "sm-landing",

@@ -1,0 +1,16 @@
+<bit-dialog>
+  <span bitDialogTitle>{{ title }}</span>
+  <ng-container bitDialogContent>
+    <bit-form-field>
+      <bit-label>Name</bit-label>
+      <input bitInput type="text" [formControl]="name" />
+    </bit-form-field>
+    <p *ngIf="failed()" class="tw-mt-2 tw-text-danger">Could not save the project. Please try again.</p>
+  </ng-container>
+  <ng-container bitDialogFooter>
+    <button type="button" bitButton buttonType="primary" [disabled]="saving()" (click)="submit()">
+      Save
+    </button>
+    <button type="button" bitButton buttonType="secondary" bitDialogClose>Cancel</button>
+  </ng-container>
+</bit-dialog>
