@@ -1,5 +1,5 @@
 {
   "repo": "https://github.com/bitwarden/clients.git",
   "ref": "web-v2026.10.0",
-  "comment": "Pinned upstream bitwarden/clients tag. Must be recent enough to recognize the 'vfo1-foundation' client feature flag (the fork of vaultwarden enables it via EXPERIMENTAL_CLIENT_FEATURE_FLAGS). Change in lockstep with the web-vault version the companion vaultwarden targets."
+  "comment": "Pinned bitwarden/clients tag for the overlay build. Trying 2026.10.0 (recon was done against this line; it carries the vfo1-foundation flag). NOTE: the companion vaultwarden (exomind-tmi fork, develop) bundles web-vault v2026.8.0 (docker/DockerSettings.yaml) — this pin is two minors ahead of the server. If any web-vault<->server API mismatch shows up, fall back to web-v2026.8.0 (one-line change + rebuild)."
 }
