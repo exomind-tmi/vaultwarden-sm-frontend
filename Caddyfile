@@ -10,19 +10,22 @@
 	# Secrets Manager API -> our backend. The prefix is stripped, so the backend sees its normal
 	# /api and /identity (which lets bws point at this same origin under /sm-api, too).
 	handle_path /sm-api/* {
-		reverse_proxy {$VAULTWARDEN_SM_URL}
+		reverse_proxy {$VAULTWARDEN_SM_URL:http://vaultwarden-sm:8080}
 	}
 
 	# Base vault traffic -> the companion vaultwarden (its API, login, notifications, icons, …).
 	@base path /api/* /identity/* /notifications/* /icons/* /attachments/* /events/*
 	handle @base {
-		reverse_proxy {$VAULTWARDEN_URL}
+		reverse_proxy {$VAULTWARDEN_URL:http://vaultwarden:80}
 	}
 
-	# Everything else: our static web vault (single-page app, hash routing).
+	# Our static web vault (single-page app, hash routing). A missing file returns a clean 404 —
+	# never the HTML shell — so an edge cache can't pin HTML under a .js/.css URL across deploys.
+	# The HTML shell itself must never be cached stale; content-hashed assets are safe to cache.
 	handle {
 		root * /srv
-		try_files {path} /index.html
+		@html path / /index.html
+		header @html Cache-Control "no-cache"
 		file_server
 	}
 }
