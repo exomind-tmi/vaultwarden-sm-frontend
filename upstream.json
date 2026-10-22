@@ -1,5 +1,5 @@
 {
-  "repo": "https://github.com/bitwarden/clients.git",
-  "ref": "web-v2026.10.0",
-  "comment": "Pinned bitwarden/clients tag for the overlay build. Trying 2026.10.0 (recon was done against this line; it carries the vfo1-foundation flag). NOTE: the companion vaultwarden (exomind-tmi fork, develop) bundles web-vault v2026.8.0 (docker/DockerSettings.yaml) — this pin is two minors ahead of the server. If any web-vault<->server API mismatch shows up, fall back to web-v2026.8.0 (one-line change + rebuild)."
+  "repo": "https://github.com/vaultwarden/vw_web_builds.git",
+  "ref": "v2026.8.0",
+  "comment": "Base is vaultwarden's own web-vault fork (vaultwarden/vw_web_builds) at the tag the companion vaultwarden ships (docker/DockerSettings.yaml vault_version v2026.8.0). This fork already carries vaultwarden's patches - no Bitwarden cloud/billing/license cruft - which is why bw_web_builds checks it out instead of patching bitwarden/clients on the fly. Our SM overlay and /sm route go on top. Move in lockstep with vaultwarden's vault_version."
 }

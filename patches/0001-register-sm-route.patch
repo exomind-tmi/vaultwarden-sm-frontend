@@ -1,8 +1,10 @@
+diff --git a/apps/web/src/app/oss-routing.module.ts b/apps/web/src/app/oss-routing.module.ts
+index 0c5d9b4..216634b 100644
 --- a/apps/web/src/app/oss-routing.module.ts
 +++ b/apps/web/src/app/oss-routing.module.ts
-@@ -715,6 +715,11 @@
-         canActivate: [canAccessFeature(FeatureFlag.VFO1Foundation, true, "/vault")],
-         data: { titleId: "myFolders" } satisfies RouteDataProperties,
+@@ -674,6 +674,11 @@ const routes: Routes = [
+         ],
+         canDeactivate: [unsavedSendEditsGuard],
        },
 +      {
 +        path: "sm",
