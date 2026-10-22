@@ -1,0 +1,28 @@
+{
+	admin off
+	auto_https off
+}
+
+# TLS terminates at the edge (Cloudflare Tunnel / reverse proxy), so plain :80 here.
+:80 {
+	encode zstd gzip
+
+	# Secrets Manager API -> our backend. The prefix is stripped, so the backend sees its normal
+	# /api and /identity (which lets bws point at this same origin under /sm-api, too).
+	handle_path /sm-api/* {
+		reverse_proxy {$VAULTWARDEN_SM_URL}
+	}
+
+	# Base vault traffic -> the companion vaultwarden (its API, login, notifications, icons, …).
+	@base path /api/* /identity/* /notifications/* /icons/* /attachments/* /events/*
+	handle @base {
+		reverse_proxy {$VAULTWARDEN_URL}
+	}
+
+	# Everything else: our static web vault (single-page app, hash routing).
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

@@ -1,61 +1,70 @@
 # vaultwarden-sm-frontend
 
 An **overlay build** of the Bitwarden OSS web vault that adds a clean-room **Secrets Manager**
-module, served by a companion [vaultwarden](https://github.com/dani-garcia/vaultwarden) instance and
+module, served alongside a companion [vaultwarden](https://github.com/dani-garcia/vaultwarden) and
 talking to the [`vaultwarden-sm`](../vaultwarden-sm) backend.
 
 This repository is **not** a fork of `bitwarden/clients`. It vendors nothing from the upstream
-monorepo. Instead it keeps only the files we own — a clean-room SM Angular module plus a handful of
-thin patches — and the build fetches a pinned upstream tag, lays our files on top, applies the
-patches, and produces the static web-vault bundle.
+monorepo: it keeps only the files we own — a clean-room SM Angular module plus a few thin patches —
+and the build fetches a pinned upstream tag, lays our files on top, applies the patches, and
+produces the static web-vault bundle. The licensed Bitwarden Secrets Manager (upstream
+`bitwarden_license/`) is never used or copied; our module is written against open `@bitwarden/*`
+libraries only.
 
-The licensed Bitwarden Secrets Manager (under `bitwarden_license/` upstream) is **never** used or
-copied. Our module is written against open `@bitwarden/*` libraries only (`common`, `components`,
-`angular`, `key-management`, `legacy-crypto`, `ui`), mirroring the same crypto pattern the backend
-is byte-compatible with (org key from `KeyService.orgKeys$`, `EncryptService.encryptString`).
-
-## How it works
+## How it works (build)
 
 ```
-upstream.json ── pinned bitwarden/clients tag (must support the "vfo1-foundation" client flag)
-overlay/      ── new files copied verbatim onto the checkout (our SM module lives here)
-patches/      ── small git-apply patches for edits to existing upstream files (e.g. the /sm route)
+upstream.json ── pinned bitwarden/clients tag
+overlay/      ── new files copied verbatim onto the checkout (our SM module)
+patches/      ── small git-apply patches for edits to existing upstream files (the /sm route)
 scripts/      ── build orchestration
-dist/         ── output: the static web-vault bundle (→ vaultwarden WEB_VAULT_FOLDER)
+Dockerfile    ── bakes dist/ into a self-contained Caddy image (serve + API proxy)
+Caddyfile     ── the serving + routing config for that image
 ```
 
-`node scripts/build.mjs`:
-
-1. **fetch** — shallow-clone the pinned `bitwarden/clients` tag into `.build/clients`.
-2. **overlay** — copy `overlay/**` onto the checkout (preserving paths).
-3. **patch** — `git apply` every `patches/*.patch` in order.
-4. **build** — `npm ci` then `npm run build:oss:selfhost:prod -w @bitwarden/web-vault`
-   (`ENV=selfhosted NODE_ENV=production`), emitting to `apps/web/build`.
-5. **collect** — copy that bundle into `dist/`.
-
-`npm run fetch` stops after step 3 (useful for authoring/refreshing patches); `npm run clean`
-removes `.build/` and `dist/`.
-
-### Requirements
-
-Node `>=24.17.0` and npm `~11` (the upstream engine constraints), plus `git`. The full install +
-build is heavy (the upstream monorepo), so it is meant for CI or a dev machine, not the NAS.
+`node scripts/build.mjs`: shallow-clone the pinned tag → copy `overlay/**` → `git apply`
+`patches/*.patch` → `npm ci` → `npm run build:oss:selfhost:prod -w @bitwarden/web-vault` → collect
+`apps/web/build` into `dist/`. CI then bakes `dist/` into the image. Node `>=24.17` + npm `~11`.
 
 ## Deployment
 
-The built `dist/` is a path-agnostic static bundle (hash routing, no `<base href>`). Mount it into
-the companion vaultwarden as its web vault:
+The build publishes one self-contained image, `ghcr.io/exomind-tmi/vaultwarden-sm-web`, that both
+serves the web vault and reverse-proxies the API. Run it as a single service next to a companion
+vaultwarden; **vaultwarden stays untouched** (a pure API backend, its own web vault can be
+disabled). Point the ingress (Cloudflare Tunnel, nginx, …) at this service on port 80.
 
-- `WEB_VAULT_FOLDER=/path/to/dist` (and `WEB_VAULT_ENABLED=true`).
+Caddy serves the static bundle from `/srv` and routes:
 
-Secrets Manager API calls go to the `vaultwarden-sm` backend; user authentication rides the existing
-vaultwarden session (no separate login). Routing/topology between the two is handled at the edge —
-see the `vaultwarden-sm` project notes.
+- `/sm-api/*` → the Secrets Manager backend (`$VAULTWARDEN_SM_URL`), prefix stripped — the backend
+  sees its normal `/api` and `/identity`, so `bws` can use the same origin under `/sm-api`;
+- `/api/*`, `/identity/*`, `/notifications/*`, `/icons/*`, `/attachments/*`, `/events/*` →
+  vaultwarden (`$VAULTWARDEN_URL`);
+- everything else → the static web vault (SPA, hash routing).
+
+Minimal compose addition:
+
+```yaml
+services:
+  vaultwarden-sm-web:
+    image: ghcr.io/exomind-tmi/vaultwarden-sm-web:main
+    container_name: vaultwarden-sm-web
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      VAULTWARDEN_URL: "http://vaultwarden:80"
+      VAULTWARDEN_SM_URL: "http://vaultwarden-sm:8080"
+    networks: [vaultwarden-network]
+    depends_on: [vaultwarden]
+```
+
+Then point the tunnel's public hostname at `http://vaultwarden-sm-web:80`.
 
 ## Status
 
-Scaffold only. The pipeline shape, pinned tag, overlay layout, and a placeholder `/sm` page are in
-place. The `/sm` route patch and the real SM screens land next.
+Scaffold + CI. The overlay builds in CI (pinned `web-v2026.10.0` + our `/sm` route + a placeholder
+page) and publishes the self-contained Caddy image. Next: a live deploy test of the placeholder,
+then the real Secrets Manager screens (Projects first) against the `vaultwarden-sm` backend over
+`/sm-api`.
 
 ## License
 

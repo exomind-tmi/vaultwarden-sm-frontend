@@ -91,7 +91,7 @@ function collectDist() {
   rmSync(DIST, { recursive: true, force: true });
   mkdirSync(DIST, { recursive: true });
   cpSync(WEB_BUILD, DIST, { recursive: true });
-  console.log(`\nStatic web-vault bundle ready in ${DIST} — point vaultwarden WEB_VAULT_FOLDER at it.`);
+  console.log(`\nStatic web-vault bundle ready in ${DIST} — baked into the vaultwarden-sm-web image at docker build.`);
 }
 
 if (args.has("--clean")) {
