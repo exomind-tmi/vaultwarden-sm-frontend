@@ -1,0 +1,70 @@
+<div class="tw-p-6">
+  <a
+    [routerLink]="['/sm', organizationId, 'projects']"
+    class="tw-text-sm tw-text-muted tw-no-underline hover:tw-text-main"
+    >← Projects</a
+  >
+  <h1 class="tw-mb-4 tw-mt-2 tw-text-2xl tw-font-semibold tw-text-main">{{ name() || "Project" }}</h1>
+
+  <nav class="tw-mb-5 tw-flex tw-gap-1 tw-border-0 tw-border-b tw-border-solid tw-border-secondary-300">
+    <button
+      *ngFor="let t of tabs"
+      type="button"
+      class="tw-border-0 tw-border-b-2 tw-border-solid tw-bg-transparent tw-px-4 tw-py-2"
+      [class.tw-border-primary-600]="tab() === t.key"
+      [class.tw-text-primary-600]="tab() === t.key"
+      [class.tw-font-semibold]="tab() === t.key"
+      [class.tw-border-transparent]="tab() !== t.key"
+      [class.tw-text-muted]="tab() !== t.key"
+      (click)="tab.set(t.key)"
+    >
+      {{ t.label }}
+    </button>
+  </nav>
+
+  <!-- Secrets in this project (read-only; edit them on the Secrets screen). -->
+  <ng-container *ngIf="tab() === 'secrets'">
+    <p *ngIf="secretsFailed()" class="tw-text-danger">Failed to load secrets.</p>
+    <p *ngIf="loadingSecrets()" class="tw-text-muted">Loading…</p>
+    <ng-container *ngIf="!loadingSecrets() && !secretsFailed()">
+      <div
+        *ngIf="secrets().length === 0"
+        class="tw-max-w-md tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-6 tw-text-center tw-text-sm tw-text-muted"
+      >
+        No secrets in this project yet.
+      </div>
+      <table *ngIf="secrets().length > 0" class="tw-w-full tw-max-w-md tw-border-collapse tw-text-left">
+        <tbody>
+          <tr
+            *ngFor="let secret of secrets()"
+            class="tw-border-0 tw-border-b tw-border-solid tw-border-secondary-200"
+          >
+            <td class="tw-py-3 tw-font-mono tw-text-main">{{ secret.key }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </ng-container>
+
+  <!-- People with access. -->
+  <sm-access-list
+    *ngIf="tab() === 'people'"
+    listId="project-people"
+    emptyText="No people have access to this project."
+    writeMode="optional"
+    [load]="peopleLoad"
+    [listGrantees]="peopleGrantees"
+    [save]="peopleSave"
+  ></sm-access-list>
+
+  <!-- Machine accounts with access. -->
+  <sm-access-list
+    *ngIf="tab() === 'machine-accounts'"
+    listId="project-machines"
+    emptyText="No machine accounts have access to this project."
+    writeMode="optional"
+    [load]="machinesLoad"
+    [listGrantees]="machinesGrantees"
+    [save]="machinesSave"
+  ></sm-access-list>
+</div>

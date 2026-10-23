@@ -1,14 +1,9 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from "@angular/core";
 import { FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
 
 import {
   ButtonModule,
-  DIALOG_DATA,
-  DialogConfig,
-  DialogModule,
-  DialogRef,
-  DialogService,
   FormFieldModule,
   IconButtonModule,
   InputModule,
@@ -17,24 +12,17 @@ import {
 
 import { AccessTokenView, MachineAccountService } from "./machine-account.service";
 
-export interface AccessTokensDialogParams {
-  organizationId: string;
-  machineAccountId: string;
-  machineAccountName: string;
-}
-
 /**
- * Manages a machine account's access tokens: lists them, issues new ones (the full token is shown
- * exactly once, right after creation, since the backend never stores it) and revokes them.
+ * Access-tokens tab for a machine account: lists tokens, issues new ones (the full token is shown
+ * once, right after creation, since the backend never stores it) and revokes them.
  */
 @Component({
-  selector: "sm-access-tokens-dialog",
+  selector: "sm-access-tokens-panel",
   standalone: true,
-  templateUrl: "./access-tokens-dialog.component.html",
+  templateUrl: "./access-tokens-panel.component.html",
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    DialogModule,
     ButtonModule,
     IconButtonModule,
     FormFieldModule,
@@ -42,18 +30,18 @@ export interface AccessTokensDialogParams {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccessTokensDialogComponent {
-  private readonly params = inject<AccessTokensDialogParams>(DIALOG_DATA);
-  private readonly dialogRef = inject(DialogRef);
+export class AccessTokensPanelComponent implements OnInit {
+  @Input({ required: true }) organizationId!: string;
+  @Input({ required: true }) machineAccountId!: string;
+
   private readonly machineAccountService = inject(MachineAccountService);
   private readonly toastService = inject(ToastService);
 
-  protected readonly machineAccountName = this.params.machineAccountName;
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
   protected readonly creating = signal(false);
   protected readonly tokens = signal<AccessTokenView[]>([]);
-  /** The full token string, held only until the dialog closes so it can be copied once. */
+  /** The full token string, held only until dismissed so it can be copied once. */
   protected readonly newToken = signal<string | null>(null);
 
   protected readonly name = new FormControl("", {
@@ -61,7 +49,7 @@ export class AccessTokensDialogComponent {
     validators: [Validators.required],
   });
 
-  constructor() {
+  ngOnInit(): void {
     void this.refresh();
   }
 
@@ -70,10 +58,7 @@ export class AccessTokensDialogComponent {
     this.failed.set(false);
     try {
       this.tokens.set(
-        await this.machineAccountService.listTokens(
-          this.params.organizationId,
-          this.params.machineAccountId,
-        ),
+        await this.machineAccountService.listTokens(this.organizationId, this.machineAccountId),
       );
     } catch {
       this.failed.set(true);
@@ -91,8 +76,8 @@ export class AccessTokensDialogComponent {
     this.creating.set(true);
     try {
       const token = await this.machineAccountService.createToken(
-        this.params.organizationId,
-        this.params.machineAccountId,
+        this.organizationId,
+        this.machineAccountId,
         this.name.value.trim(),
       );
       this.newToken.set(token);
@@ -120,20 +105,11 @@ export class AccessTokensDialogComponent {
 
   protected async revoke(token: AccessTokenView): Promise<void> {
     try {
-      await this.machineAccountService.revokeToken(this.params.machineAccountId, token.id);
+      await this.machineAccountService.revokeToken(this.machineAccountId, token.id);
       this.toastService.showToast({ variant: "success", message: "Access token revoked." });
     } catch {
       this.toastService.showToast({ variant: "error", message: "Failed to revoke access token." });
     }
     await this.refresh();
   }
-
-  protected close(): void {
-    this.dialogRef.close();
-  }
 }
-
-export const openAccessTokensDialog = (
-  dialogService: DialogService,
-  config: DialogConfig<AccessTokensDialogParams>,
-) => dialogService.open(AccessTokensDialogComponent, config);

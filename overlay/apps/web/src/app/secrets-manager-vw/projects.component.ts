@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
 import { ButtonModule, DialogService, IconButtonModule, ToastService } from "@bitwarden/components";
@@ -14,7 +14,7 @@ import { ProjectService, ProjectView } from "./project.service";
   selector: "sm-projects",
   standalone: true,
   templateUrl: "./projects.component.html",
-  imports: [CommonModule, ButtonModule, IconButtonModule],
+  imports: [CommonModule, RouterLink, ButtonModule, IconButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent {
@@ -27,7 +27,7 @@ export class ProjectsComponent {
   protected readonly failed = signal(false);
   protected readonly projects = signal<ProjectView[]>([]);
 
-  private organizationId = "";
+  protected organizationId = "";
 
   constructor() {
     this.route.params

@@ -26,7 +26,13 @@
           *ngFor="let project of projects()"
           class="tw-border-0 tw-border-b tw-border-solid tw-border-secondary-200 hover:tw-bg-background-alt"
         >
-          <td class="tw-py-3 tw-pr-4 tw-text-main">{{ project.name }}</td>
+          <td class="tw-py-3 tw-pr-4">
+            <a
+              [routerLink]="['/sm', organizationId, 'projects', project.id]"
+              class="tw-font-semibold tw-text-primary-600 tw-no-underline hover:tw-underline"
+              >{{ project.name }}</a
+            >
+          </td>
           <td class="tw-whitespace-nowrap tw-py-1 tw-text-right">
             <button
               type="button"

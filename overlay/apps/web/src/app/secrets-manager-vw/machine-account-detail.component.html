@@ -1,0 +1,54 @@
+<div class="tw-p-6">
+  <a
+    [routerLink]="['/sm', organizationId, 'machine-accounts']"
+    class="tw-text-sm tw-text-muted tw-no-underline hover:tw-text-main"
+    >← Machine accounts</a
+  >
+  <h1 class="tw-mb-4 tw-mt-2 tw-text-2xl tw-font-semibold tw-text-main">
+    {{ name() || "Machine account" }}
+  </h1>
+
+  <nav class="tw-mb-5 tw-flex tw-gap-1 tw-border-0 tw-border-b tw-border-solid tw-border-secondary-300">
+    <button
+      *ngFor="let t of tabs"
+      type="button"
+      class="tw-border-0 tw-border-b-2 tw-border-solid tw-bg-transparent tw-px-4 tw-py-2"
+      [class.tw-border-primary-600]="tab() === t.key"
+      [class.tw-text-primary-600]="tab() === t.key"
+      [class.tw-font-semibold]="tab() === t.key"
+      [class.tw-border-transparent]="tab() !== t.key"
+      [class.tw-text-muted]="tab() !== t.key"
+      (click)="tab.set(t.key)"
+    >
+      {{ t.label }}
+    </button>
+  </nav>
+
+  <sm-access-tokens-panel
+    *ngIf="tab() === 'tokens'"
+    [organizationId]="organizationId"
+    [machineAccountId]="machineAccountId"
+  ></sm-access-tokens-panel>
+
+  <!-- People who manage this machine account (always read + write). -->
+  <sm-access-list
+    *ngIf="tab() === 'people'"
+    listId="sa-people"
+    emptyText="No people have access to this machine account."
+    writeMode="forced"
+    [load]="peopleLoad"
+    [listGrantees]="peopleGrantees"
+    [save]="peopleSave"
+  ></sm-access-list>
+
+  <!-- Projects this machine account is granted. -->
+  <sm-access-list
+    *ngIf="tab() === 'projects'"
+    listId="sa-projects"
+    emptyText="This machine account is not granted any projects."
+    writeMode="optional"
+    [load]="projectsLoad"
+    [listGrantees]="projectsGrantees"
+    [save]="projectsSave"
+  ></sm-access-list>
+</div>

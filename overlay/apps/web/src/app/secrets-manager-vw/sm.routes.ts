@@ -14,6 +14,11 @@ export const smRoutes: Routes = [
         loadComponent: () => import("./projects.component").then((m) => m.ProjectsComponent),
       },
       {
+        path: "projects/:projectId",
+        loadComponent: () =>
+          import("./project-detail.component").then((m) => m.ProjectDetailComponent),
+      },
+      {
         path: "secrets",
         loadComponent: () => import("./secrets.component").then((m) => m.SecretsComponent),
       },
@@ -21,6 +26,11 @@ export const smRoutes: Routes = [
         path: "machine-accounts",
         loadComponent: () =>
           import("./machine-accounts.component").then((m) => m.MachineAccountsComponent),
+      },
+      {
+        path: "machine-accounts/:machineAccountId",
+        loadComponent: () =>
+          import("./machine-account-detail.component").then((m) => m.MachineAccountDetailComponent),
       },
     ],
   },
