@@ -13,6 +13,10 @@ export const smRoutes: Routes = [
         path: "projects",
         loadComponent: () => import("./projects.component").then((m) => m.ProjectsComponent),
       },
+      {
+        path: "secrets",
+        loadComponent: () => import("./secrets.component").then((m) => m.SecretsComponent),
+      },
     ],
   },
 ];

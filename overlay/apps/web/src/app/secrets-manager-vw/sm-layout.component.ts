@@ -22,5 +22,6 @@ export class SmLayoutComponent {
   // Tabs are added here as each screen lands.
   protected readonly tabs: { path: string; label: string }[] = [
     { path: "projects", label: "Projects" },
+    { path: "secrets", label: "Secrets" },
   ];
 }
