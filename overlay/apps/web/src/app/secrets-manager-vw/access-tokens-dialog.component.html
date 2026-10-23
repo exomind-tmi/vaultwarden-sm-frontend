@@ -1,0 +1,87 @@
+<bit-dialog>
+  <span bitDialogTitle>Access tokens — {{ machineAccountName }}</span>
+  <ng-container bitDialogContent>
+    <!-- One-time reveal of a freshly created token. -->
+    <div
+      *ngIf="newToken() as token"
+      class="tw-mb-4 tw-rounded tw-border tw-border-solid tw-border-success-500 tw-bg-success-100 tw-p-3"
+    >
+      <p class="tw-mb-2 tw-text-sm tw-font-semibold tw-text-success-700">
+        Copy this access token now — it will not be shown again.
+      </p>
+      <div class="tw-flex tw-items-center tw-gap-2">
+        <input
+          bitInput
+          type="text"
+          readonly
+          [value]="token"
+          class="tw-flex-1 tw-font-mono tw-text-xs"
+        />
+        <button type="button" bitButton buttonType="primary" size="small" (click)="copy()">
+          Copy
+        </button>
+        <button
+          type="button"
+          bitIconButton="bwi-close"
+          size="small"
+          title="Dismiss"
+          (click)="dismissNewToken()"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Issue a new token. -->
+    <div class="tw-mb-4 tw-flex tw-items-end tw-gap-2">
+      <bit-form-field class="tw-mb-0 tw-flex-1">
+        <bit-label>New token name</bit-label>
+        <input bitInput type="text" [formControl]="name" (keyup.enter)="create()" />
+      </bit-form-field>
+      <button type="button" bitButton buttonType="primary" [disabled]="creating()" (click)="create()">
+        Create
+      </button>
+    </div>
+
+    <p *ngIf="failed()" class="tw-text-danger">Failed to load access tokens.</p>
+    <p *ngIf="loading()" class="tw-text-muted">Loading…</p>
+
+    <ng-container *ngIf="!loading() && !failed()">
+      <div
+        *ngIf="tokens().length === 0"
+        class="tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-6 tw-text-center tw-text-muted"
+      >
+        No access tokens yet.
+      </div>
+
+      <table *ngIf="tokens().length > 0" class="tw-w-full tw-border-collapse tw-text-left">
+        <thead>
+          <tr class="tw-border-0 tw-border-b tw-border-solid tw-border-secondary-300">
+            <th class="tw-py-2 tw-pr-4 tw-text-sm tw-font-semibold tw-uppercase tw-text-muted">
+              Name
+            </th>
+            <th class="tw-w-16 tw-py-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let token of tokens()"
+            class="tw-border-0 tw-border-b tw-border-solid tw-border-secondary-200 hover:tw-bg-background-alt"
+          >
+            <td class="tw-py-3 tw-pr-4 tw-text-main">{{ token.name }}</td>
+            <td class="tw-whitespace-nowrap tw-py-1 tw-text-right">
+              <button
+                type="button"
+                bitIconButton="bwi-trash"
+                size="small"
+                title="Revoke"
+                (click)="revoke(token)"
+              ></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </ng-container>
+  <ng-container bitDialogFooter>
+    <button type="button" bitButton buttonType="secondary" (click)="close()">Close</button>
+  </ng-container>
+</bit-dialog>

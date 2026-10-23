@@ -23,5 +23,6 @@ export class SmLayoutComponent {
   protected readonly tabs: { path: string; label: string }[] = [
     { path: "projects", label: "Projects" },
     { path: "secrets", label: "Secrets" },
+    { path: "machine-accounts", label: "Machine accounts" },
   ];
 }

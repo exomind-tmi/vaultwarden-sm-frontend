@@ -17,6 +17,11 @@ export const smRoutes: Routes = [
         path: "secrets",
         loadComponent: () => import("./secrets.component").then((m) => m.SecretsComponent),
       },
+      {
+        path: "machine-accounts",
+        loadComponent: () =>
+          import("./machine-accounts.component").then((m) => m.MachineAccountsComponent),
+      },
     ],
   },
 ];
