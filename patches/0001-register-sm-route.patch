@@ -8,8 +8,8 @@ index 0c5d9b4..a0fc7da 100644
        },
 +      {
 +        path: "sm/:organizationId",
-+        loadComponent: () =>
-+          import("./secrets-manager-vw/projects.component").then((m) => m.ProjectsComponent),
++        loadChildren: () =>
++          import("./secrets-manager-vw/sm.routes").then((m) => m.smRoutes),
 +      },
        {
          path: "sm-landing",
