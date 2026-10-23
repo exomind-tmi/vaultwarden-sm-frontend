@@ -2,13 +2,7 @@ import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from "@angular/core";
 import { FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
 
-import {
-  ButtonModule,
-  FormFieldModule,
-  IconButtonModule,
-  InputModule,
-  ToastService,
-} from "@bitwarden/components";
+import { ButtonModule, IconButtonModule, InputModule, ToastService } from "@bitwarden/components";
 
 import { AccessTokenView, MachineAccountService } from "./machine-account.service";
 
@@ -20,14 +14,7 @@ import { AccessTokenView, MachineAccountService } from "./machine-account.servic
   selector: "sm-access-tokens-panel",
   standalone: true,
   templateUrl: "./access-tokens-panel.component.html",
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ButtonModule,
-    IconButtonModule,
-    FormFieldModule,
-    InputModule,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule, IconButtonModule, InputModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccessTokensPanelComponent implements OnInit {
