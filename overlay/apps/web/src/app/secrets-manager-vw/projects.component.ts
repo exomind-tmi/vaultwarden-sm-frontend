@@ -1,24 +1,27 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
-  ButtonModule,
   DialogService,
   IconButtonModule,
-  InputModule,
   LinkModule,
   MenuModule,
+  SearchModule,
   TableDataSource,
   TableModule,
   ToastService,
 } from "@bitwarden/components";
+import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import { openProjectDialog, ProjectDialogResult } from "./project-dialog.component";
 import { ProjectService, ProjectView } from "./project.service";
+import { SmEventsService } from "./sm-events.service";
+import { SmNewMenuComponent } from "./sm-new-menu.component";
 
 /** Projects list for an organization: a sortable table with copy, overflow menu, create/edit/delete. */
 @Component({
@@ -27,13 +30,15 @@ import { ProjectService, ProjectView } from "./project.service";
   templateUrl: "./projects.component.html",
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule,
-    ButtonModule,
+    HeaderModule,
+    SearchModule,
     IconButtonModule,
-    InputModule,
     LinkModule,
     MenuModule,
     TableModule,
+    SmNewMenuComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -43,6 +48,7 @@ export class ProjectsComponent {
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
   private readonly platformUtilsService = inject(PlatformUtilsService);
+  private readonly events = inject(SmEventsService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
@@ -59,6 +65,7 @@ export class ProjectsComponent {
         this.organizationId = id;
         void this.refresh();
       });
+    this.events.changed$.pipe(takeUntilDestroyed()).subscribe(() => void this.refresh());
   }
 
   protected get hasProjects(): boolean {
@@ -75,16 +82,6 @@ export class ProjectsComponent {
       this.dataSource.data = [];
     } finally {
       this.loading.set(false);
-    }
-  }
-
-  protected async add(): Promise<void> {
-    const dialogRef = openProjectDialog(this.dialogService, {
-      data: { organizationId: this.organizationId },
-    });
-    if ((await lastValueFrom(dialogRef.closed)) === ProjectDialogResult.Saved) {
-      this.toastService.showToast({ variant: "success", message: "Project created." });
-      await this.refresh();
     }
   }
 

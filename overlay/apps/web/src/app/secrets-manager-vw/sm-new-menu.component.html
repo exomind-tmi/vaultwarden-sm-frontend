@@ -1,0 +1,15 @@
+<button type="button" bitButton buttonType="primary" [bitMenuTriggerFor]="newMenu" startIcon="bwi-plus">
+  New
+</button>
+
+<bit-menu #newMenu>
+  <button type="button" bitMenuItem (click)="newProject()">
+    <i class="bwi bwi-fw bwi-collection" aria-hidden="true"></i> Project
+  </button>
+  <button type="button" bitMenuItem (click)="newSecret()">
+    <i class="bwi bwi-fw bwi-key" aria-hidden="true"></i> Secret
+  </button>
+  <button type="button" bitMenuItem (click)="newMachineAccount()">
+    <i class="bwi bwi-fw bwi-wrench" aria-hidden="true"></i> Machine account
+  </button>
+</bit-menu>

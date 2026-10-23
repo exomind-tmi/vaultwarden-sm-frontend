@@ -1,27 +1,30 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
-  ButtonModule,
   DialogService,
   IconButtonModule,
-  InputModule,
   LinkModule,
   MenuModule,
+  SearchModule,
   TableDataSource,
   TableModule,
   ToastService,
 } from "@bitwarden/components";
+import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import {
   MachineAccountDialogResult,
   openMachineAccountDialog,
 } from "./machine-account-dialog.component";
 import { MachineAccountService, MachineAccountView } from "./machine-account.service";
+import { SmEventsService } from "./sm-events.service";
+import { SmNewMenuComponent } from "./sm-new-menu.component";
 
 /** Machine accounts list: sortable table with copy, overflow menu, create/edit/delete. */
 @Component({
@@ -30,13 +33,15 @@ import { MachineAccountService, MachineAccountView } from "./machine-account.ser
   templateUrl: "./machine-accounts.component.html",
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule,
-    ButtonModule,
+    HeaderModule,
+    SearchModule,
     IconButtonModule,
-    InputModule,
     LinkModule,
     MenuModule,
     TableModule,
+    SmNewMenuComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -46,6 +51,7 @@ export class MachineAccountsComponent {
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
   private readonly platformUtilsService = inject(PlatformUtilsService);
+  private readonly events = inject(SmEventsService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
@@ -62,6 +68,7 @@ export class MachineAccountsComponent {
         this.organizationId = id;
         void this.refresh();
       });
+    this.events.changed$.pipe(takeUntilDestroyed()).subscribe(() => void this.refresh());
   }
 
   protected get hasMachineAccounts(): boolean {
@@ -78,16 +85,6 @@ export class MachineAccountsComponent {
       this.dataSource.data = [];
     } finally {
       this.loading.set(false);
-    }
-  }
-
-  protected async add(): Promise<void> {
-    const dialogRef = openMachineAccountDialog(this.dialogService, {
-      data: { organizationId: this.organizationId },
-    });
-    if ((await lastValueFrom(dialogRef.closed)) === MachineAccountDialogResult.Saved) {
-      this.toastService.showToast({ variant: "success", message: "Machine account created." });
-      await this.refresh();
     }
   }
 

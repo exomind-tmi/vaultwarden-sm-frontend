@@ -1,24 +1,27 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
   BadgeModule,
-  ButtonModule,
   DialogService,
   IconButtonModule,
-  InputModule,
   MenuModule,
+  SearchModule,
   TableDataSource,
   TableModule,
   ToastService,
 } from "@bitwarden/components";
+import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import { openSecretDialog, SecretDialogResult } from "./secret-dialog.component";
 import { SecretListView, SecretService } from "./secret.service";
+import { SmEventsService } from "./sm-events.service";
+import { SmNewMenuComponent } from "./sm-new-menu.component";
 
 /** Secrets list for an organization: sortable table with copy-value, overflow menu, create/edit/delete. */
 @Component({
@@ -27,13 +30,15 @@ import { SecretListView, SecretService } from "./secret.service";
   templateUrl: "./secrets.component.html",
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule,
+    HeaderModule,
+    SearchModule,
     BadgeModule,
-    ButtonModule,
     IconButtonModule,
-    InputModule,
     MenuModule,
     TableModule,
+    SmNewMenuComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -43,6 +48,7 @@ export class SecretsComponent {
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
   private readonly platformUtilsService = inject(PlatformUtilsService);
+  private readonly events = inject(SmEventsService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
@@ -59,6 +65,7 @@ export class SecretsComponent {
         this.organizationId = id;
         void this.refresh();
       });
+    this.events.changed$.pipe(takeUntilDestroyed()).subscribe(() => void this.refresh());
   }
 
   protected get hasSecrets(): boolean {
@@ -79,16 +86,6 @@ export class SecretsComponent {
       this.dataSource.data = [];
     } finally {
       this.loading.set(false);
-    }
-  }
-
-  protected async add(): Promise<void> {
-    const dialogRef = openSecretDialog(this.dialogService, {
-      data: { organizationId: this.organizationId },
-    });
-    if ((await lastValueFrom(dialogRef.closed)) === SecretDialogResult.Saved) {
-      this.toastService.showToast({ variant: "success", message: "Secret created." });
-      await this.refresh();
     }
   }
 

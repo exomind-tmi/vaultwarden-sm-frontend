@@ -11,13 +11,22 @@ import {
   openMachineAccountDialog,
 } from "./machine-account-dialog.component";
 import { MachineAccountService } from "./machine-account.service";
+import { SmNewMenuComponent } from "./sm-new-menu.component";
 
 /** A machine account's page: a header with breadcrumb + routed tabs (Access tokens / People / Projects). */
 @Component({
   selector: "sm-machine-account-detail",
   standalone: true,
   templateUrl: "./machine-account-detail.component.html",
-  imports: [CommonModule, RouterModule, HeaderModule, BreadcrumbsModule, TabsModule, ButtonModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HeaderModule,
+    BreadcrumbsModule,
+    TabsModule,
+    ButtonModule,
+    SmNewMenuComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MachineAccountDetailComponent {

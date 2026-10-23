@@ -8,13 +8,22 @@ import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.mod
 
 import { openProjectDialog, ProjectDialogResult } from "./project-dialog.component";
 import { ProjectService } from "./project.service";
+import { SmNewMenuComponent } from "./sm-new-menu.component";
 
 /** A project's page: a header with breadcrumb + routed tabs (Secrets / People / Machine accounts). */
 @Component({
   selector: "sm-project-detail",
   standalone: true,
   templateUrl: "./project-detail.component.html",
-  imports: [CommonModule, RouterModule, HeaderModule, BreadcrumbsModule, TabsModule, ButtonModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HeaderModule,
+    BreadcrumbsModule,
+    TabsModule,
+    ButtonModule,
+    SmNewMenuComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectDetailComponent {
