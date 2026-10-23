@@ -18,7 +18,7 @@ import {
 } from "@bitwarden/components";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
-import { openProjectDialog, ProjectDialogResult } from "./project-dialog.component";
+import { openProjectDialog } from "./project-dialog.component";
 import { ProjectService, ProjectView } from "./project.service";
 import { SmEventsService } from "./sm-events.service";
 import { SmNewMenuComponent } from "./sm-new-menu.component";
@@ -89,7 +89,7 @@ export class ProjectsComponent {
     const dialogRef = openProjectDialog(this.dialogService, {
       data: { organizationId: this.organizationId, project },
     });
-    if ((await lastValueFrom(dialogRef.closed)) === ProjectDialogResult.Saved) {
+    if (await lastValueFrom(dialogRef.closed)) {
       this.toastService.showToast({ variant: "success", message: "Project saved." });
       await this.refresh();
     }

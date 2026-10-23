@@ -63,9 +63,10 @@ export class MachineAccountService {
     );
   }
 
-  async create(organizationId: string, name: string): Promise<void> {
+  /** Creates the machine account and returns its id. */
+  async create(organizationId: string, name: string): Promise<string> {
     const orgKey = await this.orgKey(organizationId);
-    await this.apiService.send(
+    const r = await this.apiService.send(
       "POST",
       `/organizations/${organizationId}/service-accounts`,
       { name: await this.enc(name, orgKey) },
@@ -73,6 +74,7 @@ export class MachineAccountService {
       true,
       SM_API_URL,
     );
+    return r.id;
   }
 
   async update(organizationId: string, id: string, name: string): Promise<void> {

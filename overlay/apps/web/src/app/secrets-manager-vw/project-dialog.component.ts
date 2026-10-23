@@ -15,12 +15,6 @@ import {
 
 import { ProjectService, ProjectView } from "./project.service";
 
-export const ProjectDialogResult = {
-  Saved: "saved",
-  Cancelled: "cancelled",
-} as const;
-export type ProjectDialogResult = (typeof ProjectDialogResult)[keyof typeof ProjectDialogResult];
-
 export interface ProjectDialogParams {
   organizationId: string;
   project?: ProjectView;
@@ -36,7 +30,7 @@ export interface ProjectDialogParams {
 })
 export class ProjectDialogComponent {
   private readonly params = inject<ProjectDialogParams>(DIALOG_DATA);
-  private readonly dialogRef = inject<DialogRef<ProjectDialogResult>>(DialogRef);
+  private readonly dialogRef = inject<DialogRef<string>>(DialogRef);
   private readonly projectService = inject(ProjectService);
 
   protected readonly editing = this.params.project != null;
@@ -57,12 +51,14 @@ export class ProjectDialogComponent {
     this.failed.set(false);
     try {
       const value = this.name.value.trim();
+      let id: string;
       if (this.params.project) {
-        await this.projectService.update(this.params.organizationId, this.params.project.id, value);
+        id = this.params.project.id;
+        await this.projectService.update(this.params.organizationId, id, value);
       } else {
-        await this.projectService.create(this.params.organizationId, value);
+        id = await this.projectService.create(this.params.organizationId, value);
       }
-      this.dialogRef.close(ProjectDialogResult.Saved);
+      this.dialogRef.close(id);
     } catch {
       this.failed.set(true);
     } finally {
@@ -74,4 +70,4 @@ export class ProjectDialogComponent {
 export const openProjectDialog = (
   dialogService: DialogService,
   config: DialogConfig<ProjectDialogParams>,
-) => dialogService.open<ProjectDialogResult, ProjectDialogParams>(ProjectDialogComponent, config);
+) => dialogService.open<string, ProjectDialogParams>(ProjectDialogComponent, config);

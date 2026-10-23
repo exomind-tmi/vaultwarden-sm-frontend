@@ -15,13 +15,6 @@ import {
 
 import { MachineAccountService, MachineAccountView } from "./machine-account.service";
 
-export const MachineAccountDialogResult = {
-  Saved: "saved",
-  Cancelled: "cancelled",
-} as const;
-export type MachineAccountDialogResult =
-  (typeof MachineAccountDialogResult)[keyof typeof MachineAccountDialogResult];
-
 export interface MachineAccountDialogParams {
   organizationId: string;
   machineAccount?: MachineAccountView;
@@ -37,7 +30,7 @@ export interface MachineAccountDialogParams {
 })
 export class MachineAccountDialogComponent {
   private readonly params = inject<MachineAccountDialogParams>(DIALOG_DATA);
-  private readonly dialogRef = inject<DialogRef<MachineAccountDialogResult>>(DialogRef);
+  private readonly dialogRef = inject<DialogRef<string>>(DialogRef);
   private readonly machineAccountService = inject(MachineAccountService);
 
   protected readonly editing = this.params.machineAccount != null;
@@ -58,16 +51,14 @@ export class MachineAccountDialogComponent {
     this.failed.set(false);
     try {
       const value = this.name.value.trim();
+      let id: string;
       if (this.params.machineAccount) {
-        await this.machineAccountService.update(
-          this.params.organizationId,
-          this.params.machineAccount.id,
-          value,
-        );
+        id = this.params.machineAccount.id;
+        await this.machineAccountService.update(this.params.organizationId, id, value);
       } else {
-        await this.machineAccountService.create(this.params.organizationId, value);
+        id = await this.machineAccountService.create(this.params.organizationId, value);
       }
-      this.dialogRef.close(MachineAccountDialogResult.Saved);
+      this.dialogRef.close(id);
     } catch {
       this.failed.set(true);
     } finally {
@@ -80,7 +71,7 @@ export const openMachineAccountDialog = (
   dialogService: DialogService,
   config: DialogConfig<MachineAccountDialogParams>,
 ) =>
-  dialogService.open<MachineAccountDialogResult, MachineAccountDialogParams>(
+  dialogService.open<string, MachineAccountDialogParams>(
     MachineAccountDialogComponent,
     config,
   );

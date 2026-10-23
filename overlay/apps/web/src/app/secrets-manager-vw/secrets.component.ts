@@ -18,7 +18,7 @@ import {
 } from "@bitwarden/components";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
-import { openSecretDialog, SecretDialogResult } from "./secret-dialog.component";
+import { openSecretDialog } from "./secret-dialog.component";
 import { SecretListView, SecretService } from "./secret.service";
 import { SmEventsService } from "./sm-events.service";
 import { SmNewMenuComponent } from "./sm-new-menu.component";
@@ -93,7 +93,7 @@ export class SecretsComponent {
     const dialogRef = openSecretDialog(this.dialogService, {
       data: { organizationId: this.organizationId, secret },
     });
-    if ((await lastValueFrom(dialogRef.closed)) === SecretDialogResult.Saved) {
+    if (await lastValueFrom(dialogRef.closed)) {
       this.toastService.showToast({ variant: "success", message: "Secret saved." });
       await this.refresh();
     }

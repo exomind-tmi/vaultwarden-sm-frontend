@@ -92,9 +92,10 @@ export class SecretService {
     };
   }
 
-  async create(organizationId: string, input: SecretInput): Promise<void> {
+  /** Creates the secret and returns its id. */
+  async create(organizationId: string, input: SecretInput): Promise<string> {
     const body = await this.body(organizationId, input);
-    await this.apiService.send(
+    const r = await this.apiService.send(
       "POST",
       `/organizations/${organizationId}/secrets`,
       body,
@@ -102,6 +103,7 @@ export class SecretService {
       true,
       SM_API_URL,
     );
+    return r.id;
   }
 
   async update(organizationId: string, id: string, input: SecretInput): Promise<void> {

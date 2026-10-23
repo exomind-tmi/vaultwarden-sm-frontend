@@ -7,7 +7,6 @@ import { BreadcrumbsModule, ButtonModule, DialogService, TabsModule, ToastServic
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import {
-  MachineAccountDialogResult,
   openMachineAccountDialog,
 } from "./machine-account-dialog.component";
 import { MachineAccountService } from "./machine-account.service";
@@ -62,7 +61,7 @@ export class MachineAccountDetailComponent {
     const dialogRef = openMachineAccountDialog(this.dialogService, {
       data: { organizationId: this.organizationId, machineAccount },
     });
-    if ((await lastValueFrom(dialogRef.closed)) === MachineAccountDialogResult.Saved) {
+    if (await lastValueFrom(dialogRef.closed)) {
       this.toastService.showToast({ variant: "success", message: "Machine account saved." });
       await this.loadName();
     }

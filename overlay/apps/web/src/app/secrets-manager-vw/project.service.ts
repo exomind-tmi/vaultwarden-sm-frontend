@@ -57,10 +57,11 @@ export class ProjectService {
     );
   }
 
-  async create(organizationId: string, name: string): Promise<void> {
+  /** Creates the project and returns its id. */
+  async create(organizationId: string, name: string): Promise<string> {
     const orgKey = await this.orgKey(organizationId);
     const encName = (await this.encryptService.encryptString(name, orgKey)).encryptedString;
-    await this.apiService.send(
+    const r = await this.apiService.send(
       "POST",
       `/organizations/${organizationId}/projects`,
       { name: encName },
@@ -68,6 +69,7 @@ export class ProjectService {
       true,
       SM_API_URL,
     );
+    return r.id;
   }
 
   async update(organizationId: string, id: string, name: string): Promise<void> {
