@@ -13,7 +13,8 @@ export const smRoutes: Routes = [
     component: LayoutComponent,
     children: [
       { path: "", component: NavigationComponent, outlet: "sidebar" },
-      { path: "", pathMatch: "full", redirectTo: "projects" },
+      // Secrets is the default landing — this is a Secrets Manager, and we have no Overview page.
+      { path: "", pathMatch: "full", redirectTo: "secrets" },
       {
         path: "projects",
         loadComponent: () => import("./projects.component").then((m) => m.ProjectsComponent),
