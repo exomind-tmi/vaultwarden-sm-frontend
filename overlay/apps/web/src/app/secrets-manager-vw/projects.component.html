@@ -1,56 +1,89 @@
 <div class="tw-p-6">
-  <div class="tw-mb-4 tw-flex tw-items-center tw-justify-end">
-    <button type="button" bitButton buttonType="primary" (click)="add()">New project</button>
+  <div class="tw-mb-5 tw-flex tw-items-center tw-justify-between tw-gap-4">
+    <h1 class="tw-m-0 tw-text-2xl tw-font-semibold tw-text-main">Projects</h1>
+    <div class="tw-flex tw-items-center tw-gap-3">
+      <input
+        bitInput
+        type="search"
+        placeholder="Search projects"
+        class="tw-w-64"
+        (input)="dataSource.filter = $any($event.target).value"
+      />
+      <button type="button" bitButton buttonType="primary" (click)="add()">New project</button>
+    </div>
   </div>
 
   <p *ngIf="failed()" class="tw-text-danger">Failed to load projects.</p>
-  <p *ngIf="loading()" class="tw-text-muted">Loading…</p>
+
+  <div *ngIf="loading()" class="tw-pt-16 tw-text-center tw-text-muted">
+    <i class="bwi bwi-spinner bwi-spin bwi-2x" aria-hidden="true"></i>
+  </div>
 
   <ng-container *ngIf="!loading() && !failed()">
     <div
-      *ngIf="projects().length === 0"
-      class="tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-10 tw-text-center tw-text-muted"
+      *ngIf="!hasProjects"
+      class="tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-12 tw-text-center tw-text-muted"
     >
-      No projects yet. Create one to group your secrets.
+      <p class="tw-mb-3">No projects yet. Create one to group your secrets.</p>
+      <button type="button" bitButton buttonType="secondary" (click)="add()">New project</button>
     </div>
 
-    <table *ngIf="projects().length > 0" class="tw-w-full tw-border-collapse tw-text-left">
-      <thead>
-        <tr class="tw-border-0 tw-border-b tw-border-solid tw-border-secondary-300">
-          <th class="tw-py-2 tw-pr-4 tw-text-sm tw-font-semibold tw-uppercase tw-text-muted">Name</th>
-          <th class="tw-w-24 tw-py-2"></th>
+    <bit-table *ngIf="hasProjects" [dataSource]="dataSource">
+      <ng-container header>
+        <tr>
+          <th bitCell bitSortable="name" default>Name</th>
+          <th bitCell bitSortable="revisionDate" class="tw-whitespace-nowrap">Last edited</th>
+          <th bitCell class="tw-w-0"></th>
         </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let project of projects()"
-          class="tw-border-0 tw-border-b tw-border-solid tw-border-secondary-200 hover:tw-bg-background-alt"
-        >
-          <td class="tw-py-3 tw-pr-4">
-            <a
-              [routerLink]="['/sm', organizationId, 'projects', project.id]"
-              class="tw-font-semibold tw-text-primary-600 tw-no-underline hover:tw-underline"
-              >{{ project.name }}</a
-            >
+      </ng-container>
+      <ng-template body let-rows$>
+        <tr bitRow *ngFor="let project of rows$ | async">
+          <td bitCell>
+            <div class="tw-flex tw-items-center tw-gap-4 tw-break-all">
+              <i class="bwi bwi-collection tw-text-muted" aria-hidden="true"></i>
+              <div>
+                <a
+                  bitLink
+                  [routerLink]="['/sm', organizationId, 'projects', project.id]"
+                  >{{ project.name }}</a
+                >
+                <div class="tw-block tw-text-sm tw-text-muted">
+                  {{ project.id }}
+                  <button
+                    type="button"
+                    bitIconButton="bwi-clone"
+                    buttonType="primaryGhost"
+                    size="small"
+                    title="Copy project ID"
+                    (click)="copyId(project.id)"
+                  ></button>
+                </div>
+              </div>
+            </div>
           </td>
-          <td class="tw-whitespace-nowrap tw-py-1 tw-text-right">
+          <td bitCell class="tw-whitespace-nowrap">{{ project.revisionDate | date: "medium" }}</td>
+          <td bitCell>
             <button
               type="button"
-              bitIconButton="bwi-pencil"
-              size="small"
-              title="Edit"
-              (click)="edit(project)"
-            ></button>
-            <button
-              type="button"
-              bitIconButton="bwi-trash"
-              size="small"
-              title="Delete"
-              (click)="remove(project)"
+              bitIconButton="bwi-ellipsis-v"
+              buttonType="primaryGhost"
+              [bitMenuTriggerFor]="projectMenu"
+              title="Options"
             ></button>
           </td>
+          <bit-menu #projectMenu>
+            <a bitMenuItem [routerLink]="['/sm', organizationId, 'projects', project.id]">
+              <i class="bwi bwi-fw bwi-eye" aria-hidden="true"></i> View project
+            </a>
+            <button type="button" bitMenuItem (click)="edit(project)">
+              <i class="bwi bwi-fw bwi-pencil" aria-hidden="true"></i> Edit project
+            </button>
+            <button type="button" bitMenuItem variant="danger" (click)="remove(project)">
+              <i class="bwi bwi-fw bwi-trash" aria-hidden="true"></i> Delete project
+            </button>
+          </bit-menu>
         </tr>
-      </tbody>
-    </table>
+      </ng-template>
+    </bit-table>
   </ng-container>
 </div>

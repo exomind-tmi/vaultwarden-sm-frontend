@@ -1,16 +1,15 @@
-diff --git a/apps/web/src/app/oss-routing.module.ts b/apps/web/src/app/oss-routing.module.ts
-index 0c5d9b4..a0fc7da 100644
 --- a/apps/web/src/app/oss-routing.module.ts
 +++ b/apps/web/src/app/oss-routing.module.ts
-@@ -674,6 +674,11 @@ const routes: Routes = [
-         ],
-         canDeactivate: [unsavedSendEditsGuard],
-       },
-+      {
-+        path: "sm/:organizationId",
-+        loadChildren: () =>
-+          import("./secrets-manager-vw/sm.routes").then((m) => m.smRoutes),
-+      },
-       {
-         path: "sm-landing",
-         component: SMLandingComponent,
+@@ -640,6 +640,12 @@
+     ],
+   },
+   {
++    path: "sm/:organizationId",
++    canActivate: [authGuard],
++    loadChildren: () =>
++      import("./secrets-manager-vw/sm.routes").then((m) => m.smRoutes),
++  },
++  {
+     path: "",
+     component: UserLayoutComponent,
+     canActivate: [deepLinkGuard(), authGuard],

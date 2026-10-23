@@ -1,13 +1,18 @@
 import { Routes } from "@angular/router";
 
-import { SmLayoutComponent } from "./sm-layout.component";
+import { LayoutComponent } from "./layout.component";
+import { NavigationComponent } from "./navigation.component";
 
-/** Routes for the Secrets Manager, mounted under `/sm/:organizationId`. */
+/**
+ * Routes for the Secrets Manager, mounted at `/sm/:organizationId` as its own top-level layout so
+ * the Password Manager navigation is replaced rather than inherited.
+ */
 export const smRoutes: Routes = [
   {
     path: "",
-    component: SmLayoutComponent,
+    component: LayoutComponent,
     children: [
+      { path: "", component: NavigationComponent, outlet: "sidebar" },
       { path: "", pathMatch: "full", redirectTo: "projects" },
       {
         path: "projects",

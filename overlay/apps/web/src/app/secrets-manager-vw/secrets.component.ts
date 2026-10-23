@@ -1,20 +1,40 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
-import { ButtonModule, DialogService, IconButtonModule, ToastService } from "@bitwarden/components";
+import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import {
+  BadgeModule,
+  ButtonModule,
+  DialogService,
+  IconButtonModule,
+  InputModule,
+  MenuModule,
+  TableDataSource,
+  TableModule,
+  ToastService,
+} from "@bitwarden/components";
 
 import { openSecretDialog, SecretDialogResult } from "./secret-dialog.component";
 import { SecretListView, SecretService } from "./secret.service";
 
-/** Secrets list for an organization: create, edit, and delete secrets. */
+/** Secrets list for an organization: sortable table with copy-value, overflow menu, create/edit/delete. */
 @Component({
   selector: "sm-secrets",
   standalone: true,
   templateUrl: "./secrets.component.html",
-  imports: [CommonModule, ButtonModule, IconButtonModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    BadgeModule,
+    ButtonModule,
+    IconButtonModule,
+    InputModule,
+    MenuModule,
+    TableModule,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SecretsComponent {
@@ -22,12 +42,12 @@ export class SecretsComponent {
   private readonly secretService = inject(SecretService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
+  private readonly platformUtilsService = inject(PlatformUtilsService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
-  protected readonly secrets = signal<SecretListView[]>([]);
-
-  private organizationId = "";
+  protected readonly dataSource = new TableDataSource<SecretListView>();
+  protected organizationId = "";
 
   constructor() {
     this.route.params
@@ -41,21 +61,25 @@ export class SecretsComponent {
       });
   }
 
+  protected get hasSecrets(): boolean {
+    return this.dataSource.data.length > 0;
+  }
+
+  protected projectName(secret: SecretListView): string {
+    return secret.projects.map((p) => p.name).join(", ");
+  }
+
   protected async refresh(): Promise<void> {
     this.loading.set(true);
     this.failed.set(false);
     try {
-      this.secrets.set(await this.secretService.list(this.organizationId));
+      this.dataSource.data = await this.secretService.list(this.organizationId);
     } catch {
       this.failed.set(true);
-      this.secrets.set([]);
+      this.dataSource.data = [];
     } finally {
       this.loading.set(false);
     }
-  }
-
-  protected projectNames(secret: SecretListView): string {
-    return secret.projects.map((p) => p.name).join(", ");
   }
 
   protected async add(): Promise<void> {
@@ -95,5 +119,21 @@ export class SecretsComponent {
       this.toastService.showToast({ variant: "error", message: "Failed to delete secret." });
     }
     await this.refresh();
+  }
+
+  protected copyId(id: string): void {
+    this.platformUtilsService.copyToClipboard(id);
+    this.toastService.showToast({ variant: "success", message: "Secret ID copied." });
+  }
+
+  /** The list omits the value, so fetch the full secret before copying. */
+  protected async copyValue(secret: SecretListView): Promise<void> {
+    try {
+      const full = await this.secretService.get(this.organizationId, secret.id);
+      this.platformUtilsService.copyToClipboard(full.value);
+      this.toastService.showToast({ variant: "success", message: "Secret value copied." });
+    } catch {
+      this.toastService.showToast({ variant: "error", message: "Failed to copy secret value." });
+    }
   }
 }

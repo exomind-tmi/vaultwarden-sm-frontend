@@ -1,20 +1,40 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
-import { ButtonModule, DialogService, IconButtonModule, ToastService } from "@bitwarden/components";
+import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import {
+  ButtonModule,
+  DialogService,
+  IconButtonModule,
+  InputModule,
+  LinkModule,
+  MenuModule,
+  TableDataSource,
+  TableModule,
+  ToastService,
+} from "@bitwarden/components";
 
 import { openProjectDialog, ProjectDialogResult } from "./project-dialog.component";
 import { ProjectService, ProjectView } from "./project.service";
 
-/** Projects list for an organization: create, rename, and delete projects. */
+/** Projects list for an organization: a sortable table with copy, overflow menu, create/edit/delete. */
 @Component({
   selector: "sm-projects",
   standalone: true,
   templateUrl: "./projects.component.html",
-  imports: [CommonModule, RouterLink, ButtonModule, IconButtonModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ButtonModule,
+    IconButtonModule,
+    InputModule,
+    LinkModule,
+    MenuModule,
+    TableModule,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent {
@@ -22,11 +42,11 @@ export class ProjectsComponent {
   private readonly projectService = inject(ProjectService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
+  private readonly platformUtilsService = inject(PlatformUtilsService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
-  protected readonly projects = signal<ProjectView[]>([]);
-
+  protected readonly dataSource = new TableDataSource<ProjectView>();
   protected organizationId = "";
 
   constructor() {
@@ -41,14 +61,18 @@ export class ProjectsComponent {
       });
   }
 
+  protected get hasProjects(): boolean {
+    return this.dataSource.data.length > 0;
+  }
+
   protected async refresh(): Promise<void> {
     this.loading.set(true);
     this.failed.set(false);
     try {
-      this.projects.set(await this.projectService.list(this.organizationId));
+      this.dataSource.data = await this.projectService.list(this.organizationId);
     } catch {
       this.failed.set(true);
-      this.projects.set([]);
+      this.dataSource.data = [];
     } finally {
       this.loading.set(false);
     }
@@ -91,5 +115,10 @@ export class ProjectsComponent {
       this.toastService.showToast({ variant: "error", message: "Failed to delete project." });
     }
     await this.refresh();
+  }
+
+  protected copyId(id: string): void {
+    this.platformUtilsService.copyToClipboard(id);
+    this.toastService.showToast({ variant: "success", message: "Project ID copied." });
   }
 }
