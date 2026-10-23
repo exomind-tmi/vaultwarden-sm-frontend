@@ -1,9 +1,9 @@
 // Overlay build orchestration for the vaultwarden Secrets Manager web vault.
 //
 // Flow: fetch the pinned bitwarden/clients tag into .build/clients, lay our clean-room overlay
-// files over it, apply the route/nav patches, install, build the OSS self-host bundle, and collect
-// the static output into dist/. The upstream checkout is disposable — everything we own lives in
-// overlay/ and patches/.
+// files over it, apply the route/nav patches, merge our UI strings into its locales, install, build
+// the OSS self-host bundle, and collect the static output into dist/. The upstream checkout is
+// disposable — everything we own lives in overlay/, patches/ and locales/.
 //
 // Usage:
 //   node scripts/build.mjs              full build
@@ -14,6 +14,8 @@ import { execFileSync } from "node:child_process";
 import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { mergeLocales } from "./merge-locales.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const BUILD = resolve(ROOT, ".build");
@@ -102,6 +104,7 @@ if (args.has("--clean")) {
 fetchClients();
 applyOverlay();
 applyPatches();
+mergeLocales(CLIENTS);
 
 if (args.has("--fetch-only")) {
   console.log("\n--fetch-only: stopped before install/build.");

@@ -1,0 +1,8 @@
+{
+  "smLoadFailed": {
+    "message": "Не удалось загрузить данные."
+  },
+  "smNoProject": {
+    "message": "Без проекта"
+  }
+}

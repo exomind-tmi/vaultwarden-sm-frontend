@@ -5,6 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
   DialogService,
@@ -16,6 +17,7 @@ import {
   TableModule,
   ToastService,
 } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import { openMachineAccountDialog } from "./machine-account-dialog.component";
@@ -39,6 +41,7 @@ import { SmNewMenuComponent } from "./sm-new-menu.component";
     MenuModule,
     TableModule,
     SmNewMenuComponent,
+    I18nPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,6 +50,7 @@ export class MachineAccountsComponent {
   private readonly machineAccountService = inject(MachineAccountService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
+  private readonly i18nService = inject(I18nService);
   private readonly platformUtilsService = inject(PlatformUtilsService);
   private readonly events = inject(SmEventsService);
 
@@ -90,32 +94,44 @@ export class MachineAccountsComponent {
       data: { organizationId: this.organizationId, machineAccount },
     });
     if (await lastValueFrom(dialogRef.closed)) {
-      this.toastService.showToast({ variant: "success", message: "Machine account saved." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("machineAccountUpdated"),
+      });
       await this.refresh();
     }
   }
 
   protected async remove(machineAccount: MachineAccountView): Promise<void> {
     const confirmed = await this.dialogService.openSimpleDialog({
-      title: "Delete machine account",
-      content: "This machine account and its access tokens will be permanently deleted.",
+      title: { key: "deleteMachineAccount" },
+      content: { key: "deleteMachineAccountDialogMessage", placeholders: [machineAccount.name] },
       type: "warning",
-      acceptButtonText: "Delete",
+      acceptButtonText: { key: "delete" },
     });
     if (!confirmed) {
       return;
     }
     try {
       await this.machineAccountService.delete([machineAccount.id]);
-      this.toastService.showToast({ variant: "success", message: "Machine account deleted." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("deleteMachineAccountToast"),
+      });
     } catch {
-      this.toastService.showToast({ variant: "error", message: "Failed to delete machine account." });
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("errorOccurred"),
+      });
     }
     await this.refresh();
   }
 
   protected copyId(id: string): void {
     this.platformUtilsService.copyToClipboard(id);
-    this.toastService.showToast({ variant: "success", message: "Machine account ID copied." });
+    this.toastService.showToast({
+      variant: "success",
+      message: this.i18nService.t("valueCopied", this.i18nService.t("uuid")),
+    });
   }
 }

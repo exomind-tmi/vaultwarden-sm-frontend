@@ -3,7 +3,15 @@ import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/cor
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom } from "rxjs";
 
-import { BreadcrumbsModule, ButtonModule, DialogService, TabsModule, ToastService } from "@bitwarden/components";
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
+import {
+  BreadcrumbsModule,
+  ButtonModule,
+  DialogService,
+  TabsModule,
+  ToastService,
+} from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import { openProjectDialog } from "./project-dialog.component";
@@ -23,6 +31,7 @@ import { SmNewMenuComponent } from "./sm-new-menu.component";
     TabsModule,
     ButtonModule,
     SmNewMenuComponent,
+    I18nPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +40,7 @@ export class ProjectDetailComponent {
   private readonly projectService = inject(ProjectService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
+  private readonly i18nService = inject(I18nService);
 
   protected readonly organizationId = this.route.snapshot.params.organizationId as string;
   protected readonly projectId = this.route.snapshot.params.projectId as string;
@@ -55,7 +65,10 @@ export class ProjectDetailComponent {
       data: { organizationId: this.organizationId, project },
     });
     if (await lastValueFrom(dialogRef.closed)) {
-      this.toastService.showToast({ variant: "success", message: "Project saved." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("projectSaved"),
+      });
       await this.loadName();
     }
   }

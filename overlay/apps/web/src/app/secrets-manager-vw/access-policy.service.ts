@@ -151,7 +151,9 @@ export class AccessPolicyService {
     kind: "projects" | "service-accounts",
   ): Promise<GranteeView[]> {
     const orgKey = await this.orgKey(organizationId);
-    const r = await this.get(`/organizations/${organizationId}/access-policies/${kind}/potential-grantees`);
+    const r = await this.get(
+      `/organizations/${organizationId}/access-policies/${kind}/potential-grantees`,
+    );
     return Promise.all(
       (r?.data ?? []).map(async (g: any) => ({
         id: g.id,

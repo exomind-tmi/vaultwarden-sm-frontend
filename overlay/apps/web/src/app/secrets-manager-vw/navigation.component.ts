@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterModule } from "@angular/router";
 
 import { SecretsManagerLogo } from "@bitwarden/assets/svg";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
+import { I18nPipe } from "@bitwarden/ui-common";
 import { OrgSwitcherComponent } from "@bitwarden/web-vault/app/layouts/org-switcher/org-switcher.component";
 import { WebLayoutModule } from "@bitwarden/web-vault/app/layouts/web-layout.module";
 
@@ -12,7 +13,7 @@ import { WebLayoutModule } from "@bitwarden/web-vault/app/layouts/web-layout.mod
   selector: "sm-navigation",
   standalone: true,
   templateUrl: "./navigation.component.html",
-  imports: [CommonModule, RouterModule, WebLayoutModule, OrgSwitcherComponent],
+  imports: [CommonModule, RouterModule, WebLayoutModule, OrgSwitcherComponent, I18nPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavigationComponent {

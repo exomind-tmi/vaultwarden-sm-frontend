@@ -85,7 +85,10 @@ export class SecretService {
       value: await this.dec(s.value, orgKey),
       note: s.note ? await this.dec(s.note, orgKey) : "",
       projects: await Promise.all(
-        (s.projects ?? []).map(async (p: any) => ({ id: p.id, name: await this.dec(p.name, orgKey) })),
+        (s.projects ?? []).map(async (p: any) => ({
+          id: p.id,
+          name: await this.dec(p.name, orgKey),
+        })),
       ),
       creationDate: s.creationDate,
       revisionDate: s.revisionDate,

@@ -1,6 +1,15 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, computed, inject, Input, OnInit, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  Input,
+  OnInit,
+  signal,
+} from "@angular/core";
 
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import {
   ButtonModule,
   IconButtonModule,
@@ -8,6 +17,7 @@ import {
   TableModule,
   ToastService,
 } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 
 import { GranteeView, GrantView } from "./access-policy.service";
 
@@ -24,18 +34,20 @@ export type SaveGrants = (grants: { id: string; read: boolean; write: boolean }[
   selector: "sm-access-editor",
   standalone: true,
   templateUrl: "./access-editor.component.html",
-  imports: [CommonModule, ButtonModule, IconButtonModule, TableModule],
+  imports: [CommonModule, ButtonModule, IconButtonModule, TableModule, I18nPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccessEditorComponent implements OnInit {
   @Input({ required: true }) hint!: string;
   @Input({ required: true }) emptyMessage!: string;
+  @Input({ required: true }) savedMessage!: string;
   @Input() writeMode: AccessWriteMode = "choice";
   @Input({ required: true }) load!: () => Promise<GrantView[]>;
   @Input({ required: true }) listGrantees!: () => Promise<GranteeView[]>;
   @Input({ required: true }) save!: SaveGrants;
 
   private readonly toastService = inject(ToastService);
+  private readonly i18nService = inject(I18nService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
@@ -113,9 +125,12 @@ export class AccessEditorComponent implements OnInit {
     this.saving.set(true);
     try {
       await this.save(this.rows().map((r) => ({ id: r.id, read: r.read, write: r.write })));
-      this.toastService.showToast({ variant: "success", message: "Access saved." });
+      this.toastService.showToast({ variant: "success", message: this.savedMessage });
     } catch {
-      this.toastService.showToast({ variant: "error", message: "Failed to save access." });
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("errorOccurred"),
+      });
     } finally {
       this.saving.set(false);
     }

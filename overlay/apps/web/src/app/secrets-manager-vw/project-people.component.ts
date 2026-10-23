@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
+import { I18nPipe } from "@bitwarden/ui-common";
+
 import { AccessEditorComponent } from "./access-editor.component";
 import { AccessPolicyService } from "./access-policy.service";
 import { routeParams } from "./sm-route-params";
@@ -10,14 +12,15 @@ import { routeParams } from "./sm-route-params";
   selector: "sm-project-people",
   standalone: true,
   template: `<sm-access-editor
-    hint="Grant organization members access to this project."
-    emptyMessage="No people have access to this project."
+    [hint]="'projectPeopleDescription' | i18n"
+    [emptyMessage]="'projectEmptyPeopleAccessPolicies' | i18n"
+    [savedMessage]="'projectAccessUpdated' | i18n"
     writeMode="choice"
     [load]="load"
     [listGrantees]="listGrantees"
     [save]="save"
   ></sm-access-editor>`,
-  imports: [AccessEditorComponent],
+  imports: [AccessEditorComponent, I18nPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectPeopleComponent {
@@ -25,7 +28,8 @@ export class ProjectPeopleComponent {
   private readonly params = routeParams(inject(ActivatedRoute));
 
   protected readonly load = () => this.policyService.getProjectPeople(this.params.projectId);
-  protected readonly listGrantees = () => this.policyService.listOrgMembers(this.params.organizationId);
+  protected readonly listGrantees = () =>
+    this.policyService.listOrgMembers(this.params.organizationId);
   protected readonly save = (grants: { id: string; read: boolean; write: boolean }[]) =>
     this.policyService.putProjectPeople(this.params.projectId, grants);
 }

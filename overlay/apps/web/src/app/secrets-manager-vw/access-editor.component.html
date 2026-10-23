@@ -2,7 +2,7 @@
   <i class="bwi bwi-spinner bwi-spin bwi-2x" aria-hidden="true"></i>
 </div>
 
-<p *ngIf="failed()" class="tw-text-danger">Failed to load access policies.</p>
+<p *ngIf="failed()" class="tw-text-danger">{{ "smLoadFailed" | i18n }}</p>
 
 <div *ngIf="!loading() && !failed()" class="tw-max-w-3xl">
   <p class="tw-mt-6 tw-text-muted">{{ hint }}</p>
@@ -11,7 +11,7 @@
   <div class="tw-mb-5 tw-flex tw-items-end tw-gap-3">
     <div class="tw-flex-1">
       <label for="access-add" class="tw-mb-1 tw-block tw-text-sm tw-font-semibold tw-text-main">
-        Add
+        {{ "add" | i18n }}
       </label>
       <select
         id="access-add"
@@ -21,12 +21,18 @@
         [disabled]="available().length === 0"
         (change)="select($event)"
       >
-        <option value="">-- Type to filter --</option>
+        <option value="">{{ "multiSelectPlaceholder" | i18n }}</option>
         <option *ngFor="let g of available()" [value]="g.id">{{ g.name }}</option>
       </select>
     </div>
-    <button type="button" bitButton buttonType="secondary" [disabled]="!selection()" (click)="add()">
-      Add
+    <button
+      type="button"
+      bitButton
+      buttonType="secondary"
+      [disabled]="!selection()"
+      (click)="add()"
+    >
+      {{ "add" | i18n }}
     </button>
   </div>
 
@@ -40,8 +46,8 @@
   <bit-table *ngIf="dataSource.data.length > 0" [dataSource]="dataSource">
     <ng-container header>
       <tr>
-        <th bitCell>Name</th>
-        <th bitCell class="tw-w-64">Permissions</th>
+        <th bitCell>{{ "name" | i18n }}</th>
+        <th bitCell class="tw-w-64">{{ "permissions" | i18n }}</th>
         <th bitCell class="tw-w-0"></th>
       </tr>
     </ng-container>
@@ -49,18 +55,22 @@
       <tr bitRow *ngFor="let row of rows$ | async">
         <td bitCell>
           {{ row.name }}
-          <span *ngIf="row.currentUser" class="tw-text-muted">(you)</span>
+          <span *ngIf="row.currentUser" class="tw-text-muted"
+            >({{ "selfOwnershipLabel" | i18n }})</span
+          >
         </td>
         <td bitCell>
-          <span *ngIf="writeMode === 'forced'" class="tw-text-muted">Can read, write</span>
+          <span *ngIf="writeMode === 'forced'" class="tw-text-muted">{{
+            "canReadWrite" | i18n
+          }}</span>
           <select
             *ngIf="writeMode === 'choice'"
             bitInput
             [value]="row.write ? 'rw' : 'r'"
             (change)="setPermission(row.id, $any($event.target).value)"
           >
-            <option value="r">Can read</option>
-            <option value="rw">Can read, write</option>
+            <option value="r">{{ "canRead" | i18n }}</option>
+            <option value="rw">{{ "canReadWrite" | i18n }}</option>
           </select>
         </td>
         <td bitCell class="tw-text-right">
@@ -69,7 +79,7 @@
             bitIconButton="bwi-close"
             buttonType="primaryGhost"
             size="small"
-            title="Remove"
+            [title]="'remove' | i18n"
             (click)="remove(row.id)"
           ></button>
         </td>
@@ -85,6 +95,6 @@
     [disabled]="saving()"
     (click)="submit()"
   >
-    Save
+    {{ "save" | i18n }}
   </button>
 </div>

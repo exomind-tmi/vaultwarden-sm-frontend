@@ -12,6 +12,7 @@ import {
   FormFieldModule,
   InputModule,
 } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 
 import { ProjectService, ProjectView } from "./project.service";
 import { SecretInput, SecretListView, SecretService } from "./secret.service";
@@ -26,7 +27,15 @@ export interface SecretDialogParams {
   selector: "sm-secret-dialog",
   standalone: true,
   templateUrl: "./secret-dialog.component.html",
-  imports: [CommonModule, ReactiveFormsModule, DialogModule, ButtonModule, FormFieldModule, InputModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    DialogModule,
+    ButtonModule,
+    FormFieldModule,
+    InputModule,
+    I18nPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SecretDialogComponent {
@@ -36,7 +45,7 @@ export class SecretDialogComponent {
   private readonly projectService = inject(ProjectService);
 
   protected readonly editing = this.params.secret != null;
-  protected readonly title = this.editing ? "Edit secret" : "New secret";
+  protected readonly titleKey = this.editing ? "editSecret" : "newSecret";
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly failed = signal(false);
@@ -61,7 +70,10 @@ export class SecretDialogComponent {
     }
     if (this.params.secret) {
       try {
-        const full = await this.secretService.get(this.params.organizationId, this.params.secret.id);
+        const full = await this.secretService.get(
+          this.params.organizationId,
+          this.params.secret.id,
+        );
         this.form.patchValue({
           key: full.key,
           value: full.value,

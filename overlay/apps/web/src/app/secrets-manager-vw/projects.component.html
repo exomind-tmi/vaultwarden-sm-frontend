@@ -1,15 +1,15 @@
-<app-header title="Projects">
+<app-header [title]="'projects' | i18n">
   <bit-search
     ngModel
     (ngModelChange)="dataSource.filter = $event"
-    placeholder="Search projects"
+    [placeholder]="'searchProjects' | i18n"
     class="tw-w-80"
   ></bit-search>
   <sm-new-menu></sm-new-menu>
 </app-header>
 
 <div class="tw-p-6">
-  <p *ngIf="failed()" class="tw-text-danger">Failed to load projects.</p>
+  <p *ngIf="failed()" class="tw-text-danger">{{ "smLoadFailed" | i18n }}</p>
 
   <div *ngIf="loading()" class="tw-pt-16 tw-text-center tw-text-muted">
     <i class="bwi bwi-spinner bwi-spin bwi-2x" aria-hidden="true"></i>
@@ -20,14 +20,16 @@
       *ngIf="!hasProjects"
       class="tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-12 tw-text-center tw-text-muted"
     >
-      No projects yet. Create one to group your secrets.
+      {{ "projectsNoItemsMessage" | i18n }}
     </div>
 
     <bit-table *ngIf="hasProjects" [dataSource]="dataSource">
       <ng-container header>
         <tr>
-          <th bitCell bitSortable="name" default>Name</th>
-          <th bitCell bitSortable="revisionDate" class="tw-whitespace-nowrap">Last edited</th>
+          <th bitCell bitSortable="name" default>{{ "name" | i18n }}</th>
+          <th bitCell bitSortable="revisionDate" class="tw-whitespace-nowrap">
+            {{ "lastEdited" | i18n }}
+          </th>
           <th bitCell class="tw-w-0"></th>
         </tr>
       </ng-container>
@@ -37,11 +39,9 @@
             <div class="tw-flex tw-items-center tw-gap-4 tw-break-all">
               <i class="bwi bwi-collection tw-text-muted" aria-hidden="true"></i>
               <div>
-                <a
-                  bitLink
-                  [routerLink]="['/sm', organizationId, 'projects', project.id]"
-                  >{{ project.name }}</a
-                >
+                <a bitLink [routerLink]="['/sm', organizationId, 'projects', project.id]">{{
+                  project.name
+                }}</a>
                 <div class="tw-block tw-text-sm tw-text-muted">
                   {{ project.id }}
                   <button
@@ -49,7 +49,7 @@
                     bitIconButton="bwi-clone"
                     buttonType="primaryGhost"
                     size="small"
-                    title="Copy project ID"
+                    [title]="'copyUuid' | i18n"
                     (click)="copyId(project.id)"
                   ></button>
                 </div>
@@ -63,18 +63,18 @@
               bitIconButton="bwi-ellipsis-v"
               buttonType="primaryGhost"
               [bitMenuTriggerFor]="projectMenu"
-              title="Options"
+              [title]="'options' | i18n"
             ></button>
           </td>
           <bit-menu #projectMenu>
             <a bitMenuItem [routerLink]="['/sm', organizationId, 'projects', project.id]">
-              <i class="bwi bwi-fw bwi-eye" aria-hidden="true"></i> View project
+              <i class="bwi bwi-fw bwi-eye" aria-hidden="true"></i> {{ "viewProject" | i18n }}
             </a>
             <button type="button" bitMenuItem (click)="edit(project)">
-              <i class="bwi bwi-fw bwi-pencil" aria-hidden="true"></i> Edit project
+              <i class="bwi bwi-fw bwi-pencil" aria-hidden="true"></i> {{ "editProject" | i18n }}
             </button>
             <button type="button" bitMenuItem variant="danger" (click)="remove(project)">
-              <i class="bwi bwi-fw bwi-trash" aria-hidden="true"></i> Delete project
+              <i class="bwi bwi-fw bwi-trash" aria-hidden="true"></i> {{ "deleteProject" | i18n }}
             </button>
           </bit-menu>
         </tr>

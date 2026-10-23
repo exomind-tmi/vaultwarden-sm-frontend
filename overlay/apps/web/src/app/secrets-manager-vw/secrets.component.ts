@@ -5,6 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
   BadgeModule,
@@ -16,6 +17,7 @@ import {
   TableModule,
   ToastService,
 } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import { openSecretDialog } from "./secret-dialog.component";
@@ -39,6 +41,7 @@ import { SmNewMenuComponent } from "./sm-new-menu.component";
     MenuModule,
     TableModule,
     SmNewMenuComponent,
+    I18nPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,6 +50,7 @@ export class SecretsComponent {
   private readonly secretService = inject(SecretService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
+  private readonly i18nService = inject(I18nService);
   private readonly platformUtilsService = inject(PlatformUtilsService);
   private readonly events = inject(SmEventsService);
 
@@ -94,33 +98,45 @@ export class SecretsComponent {
       data: { organizationId: this.organizationId, secret },
     });
     if (await lastValueFrom(dialogRef.closed)) {
-      this.toastService.showToast({ variant: "success", message: "Secret saved." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("secretEdited"),
+      });
       await this.refresh();
     }
   }
 
   protected async remove(secret: SecretListView): Promise<void> {
     const confirmed = await this.dialogService.openSimpleDialog({
-      title: "Delete secret",
-      content: "This secret will be permanently deleted.",
+      title: { key: "deleteSecret" },
+      content: { key: "hardDeleteSecretConfirmation" },
       type: "warning",
-      acceptButtonText: "Delete",
+      acceptButtonText: { key: "delete" },
     });
     if (!confirmed) {
       return;
     }
     try {
       await this.secretService.delete([secret.id]);
-      this.toastService.showToast({ variant: "success", message: "Secret deleted." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("hardDeleteSuccessToast"),
+      });
     } catch {
-      this.toastService.showToast({ variant: "error", message: "Failed to delete secret." });
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("errorOccurred"),
+      });
     }
     await this.refresh();
   }
 
   protected copyId(id: string): void {
     this.platformUtilsService.copyToClipboard(id);
-    this.toastService.showToast({ variant: "success", message: "Secret ID copied." });
+    this.toastService.showToast({
+      variant: "success",
+      message: this.i18nService.t("valueCopied", this.i18nService.t("uuid")),
+    });
   }
 
   /** The list omits the value, so fetch the full secret before copying. */
@@ -128,9 +144,15 @@ export class SecretsComponent {
     try {
       const full = await this.secretService.get(this.organizationId, secret.id);
       this.platformUtilsService.copyToClipboard(full.value);
-      this.toastService.showToast({ variant: "success", message: "Secret value copied." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("valueCopied", this.i18nService.t("value")),
+      });
     } catch {
-      this.toastService.showToast({ variant: "error", message: "Failed to copy secret value." });
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("errorOccurred"),
+      });
     }
   }
 }

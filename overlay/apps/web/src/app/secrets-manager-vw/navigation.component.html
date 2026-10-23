@@ -1,22 +1,22 @@
 <app-side-nav>
-  <bit-nav-logo [openIcon]="logo" route="." label="Secrets Manager"></bit-nav-logo>
+  <bit-nav-logo [openIcon]="logo" route="." [label]="'secretsManager' | i18n"></bit-nav-logo>
   <org-switcher [filter]="orgFilter"></org-switcher>
 
   <bit-nav-item
     icon="bwi-collection"
-    text="Projects"
+    [text]="'projects' | i18n"
     route="projects"
     [relativeTo]="route.parent"
   ></bit-nav-item>
   <bit-nav-item
     icon="bwi-key"
-    text="Secrets"
+    [text]="'secrets' | i18n"
     route="secrets"
     [relativeTo]="route.parent"
   ></bit-nav-item>
   <bit-nav-item
     icon="bwi-wrench"
-    text="Machine accounts"
+    [text]="'machineAccounts' | i18n"
     route="machine-accounts"
     [relativeTo]="route.parent"
   ></bit-nav-item>

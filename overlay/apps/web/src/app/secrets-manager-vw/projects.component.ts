@@ -5,6 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom, map } from "rxjs";
 
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import {
   DialogService,
@@ -16,6 +17,7 @@ import {
   TableModule,
   ToastService,
 } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
 import { openProjectDialog } from "./project-dialog.component";
@@ -39,6 +41,7 @@ import { SmNewMenuComponent } from "./sm-new-menu.component";
     MenuModule,
     TableModule,
     SmNewMenuComponent,
+    I18nPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,6 +50,7 @@ export class ProjectsComponent {
   private readonly projectService = inject(ProjectService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
+  private readonly i18nService = inject(I18nService);
   private readonly platformUtilsService = inject(PlatformUtilsService);
   private readonly events = inject(SmEventsService);
 
@@ -90,32 +94,44 @@ export class ProjectsComponent {
       data: { organizationId: this.organizationId, project },
     });
     if (await lastValueFrom(dialogRef.closed)) {
-      this.toastService.showToast({ variant: "success", message: "Project saved." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("projectSaved"),
+      });
       await this.refresh();
     }
   }
 
   protected async remove(project: ProjectView): Promise<void> {
     const confirmed = await this.dialogService.openSimpleDialog({
-      title: "Delete project",
-      content: "This project and its access policies will be permanently deleted.",
+      title: { key: "deleteProject" },
+      content: { key: "deleteProjectDialogMessage", placeholders: [project.name] },
       type: "warning",
-      acceptButtonText: "Delete",
+      acceptButtonText: { key: "delete" },
     });
     if (!confirmed) {
       return;
     }
     try {
       await this.projectService.delete([project.id]);
-      this.toastService.showToast({ variant: "success", message: "Project deleted." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("deleteProjectToast"),
+      });
     } catch {
-      this.toastService.showToast({ variant: "error", message: "Failed to delete project." });
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("errorOccurred"),
+      });
     }
     await this.refresh();
   }
 
   protected copyId(id: string): void {
     this.platformUtilsService.copyToClipboard(id);
-    this.toastService.showToast({ variant: "success", message: "Project ID copied." });
+    this.toastService.showToast({
+      variant: "success",
+      message: this.i18nService.t("valueCopied", this.i18nService.t("uuid")),
+    });
   }
 }

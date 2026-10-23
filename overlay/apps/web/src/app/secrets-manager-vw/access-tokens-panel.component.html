@@ -4,16 +4,24 @@
   class="tw-mb-4 tw-max-w-xl tw-rounded tw-border tw-border-solid tw-border-success-500 tw-bg-success-100 tw-p-3"
 >
   <p class="tw-mb-2 tw-text-sm tw-font-semibold tw-text-success-700">
-    Copy this access token now — it will not be shown again.
+    {{ "accessTokenCallOutTitle" | i18n }}
   </p>
   <div class="tw-flex tw-items-center tw-gap-2">
-    <input bitInput type="text" readonly [value]="token" class="tw-flex-1 tw-font-mono tw-text-xs" />
-    <button type="button" bitButton buttonType="primary" size="small" (click)="copy()">Copy</button>
+    <input
+      bitInput
+      type="text"
+      readonly
+      [value]="token"
+      class="tw-flex-1 tw-font-mono tw-text-xs"
+    />
+    <button type="button" bitButton buttonType="primary" size="small" (click)="copy()">
+      {{ "copy" | i18n }}
+    </button>
     <button
       type="button"
       bitIconButton="bwi-close"
       size="small"
-      title="Dismiss"
+      [title]="'dismiss' | i18n"
       (click)="dismissNewToken()"
     ></button>
   </div>
@@ -22,7 +30,7 @@
 <!-- Issue a new token. -->
 <div class="tw-mb-4 tw-max-w-md">
   <label for="new-token-name" class="tw-mb-1 tw-block tw-text-sm tw-font-semibold tw-text-main">
-    New token name
+    {{ "name" | i18n }}
   </label>
   <div class="tw-flex tw-items-center tw-gap-2">
     <input
@@ -40,20 +48,20 @@
       [disabled]="creating() || name.invalid"
       (click)="create()"
     >
-      Create
+      {{ "create" | i18n }}
     </button>
   </div>
 </div>
 
-<p *ngIf="failed()" class="tw-text-danger">Failed to load access tokens.</p>
-<p *ngIf="loading()" class="tw-text-muted">Loading…</p>
+<p *ngIf="failed()" class="tw-text-danger">{{ "smLoadFailed" | i18n }}</p>
+<p *ngIf="loading()" class="tw-text-muted">{{ "loading" | i18n }}</p>
 
 <ng-container *ngIf="!loading() && !failed()">
   <div
     *ngIf="tokens().length === 0"
     class="tw-max-w-md tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-6 tw-text-center tw-text-muted"
   >
-    No access tokens yet.
+    {{ "accessTokensNoItemsTitle" | i18n }}
   </div>
 
   <table *ngIf="tokens().length > 0" class="tw-w-full tw-max-w-md tw-border-collapse tw-text-left">
@@ -68,7 +76,7 @@
             type="button"
             bitIconButton="bwi-trash"
             size="small"
-            title="Revoke"
+            [title]="'revokeAccessToken' | i18n"
             (click)="revoke(token)"
           ></button>
         </td>

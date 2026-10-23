@@ -12,6 +12,7 @@ import {
   FormFieldModule,
   InputModule,
 } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 
 import { ProjectService, ProjectView } from "./project.service";
 
@@ -25,7 +26,15 @@ export interface ProjectDialogParams {
   selector: "sm-project-dialog",
   standalone: true,
   templateUrl: "./project-dialog.component.html",
-  imports: [CommonModule, ReactiveFormsModule, DialogModule, ButtonModule, FormFieldModule, InputModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    DialogModule,
+    ButtonModule,
+    FormFieldModule,
+    InputModule,
+    I18nPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectDialogComponent {
@@ -34,7 +43,7 @@ export class ProjectDialogComponent {
   private readonly projectService = inject(ProjectService);
 
   protected readonly editing = this.params.project != null;
-  protected readonly title = this.editing ? "Edit project" : "New project";
+  protected readonly titleKey = this.editing ? "editProject" : "newProject";
   protected readonly saving = signal(false);
   protected readonly failed = signal(false);
   protected readonly name = new FormControl(this.params.project?.name ?? "", {

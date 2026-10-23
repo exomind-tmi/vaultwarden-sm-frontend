@@ -1,0 +1,10 @@
+{
+  "smLoadFailed": {
+    "message": "Failed to load data.",
+    "description": "Secrets Manager: a list or panel could not be loaded from the server."
+  },
+  "smNoProject": {
+    "message": "No project",
+    "description": "Secrets Manager: secret dialog, the option for a secret that belongs to no project."
+  }
+}

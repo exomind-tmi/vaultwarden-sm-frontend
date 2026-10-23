@@ -1,15 +1,21 @@
-<button type="button" bitButton buttonType="primary" [bitMenuTriggerFor]="newMenu" startIcon="bwi-plus">
-  New
+<button
+  type="button"
+  bitButton
+  buttonType="primary"
+  [bitMenuTriggerFor]="newMenu"
+  startIcon="bwi-plus"
+>
+  {{ "new" | i18n }}
 </button>
 
 <bit-menu #newMenu>
   <button type="button" bitMenuItem (click)="newProject()">
-    <i class="bwi bwi-fw bwi-collection" aria-hidden="true"></i> Project
+    <i class="bwi bwi-fw bwi-collection" aria-hidden="true"></i> {{ "project" | i18n }}
   </button>
   <button type="button" bitMenuItem (click)="newSecret()">
-    <i class="bwi bwi-fw bwi-key" aria-hidden="true"></i> Secret
+    <i class="bwi bwi-fw bwi-key" aria-hidden="true"></i> {{ "secret" | i18n }}
   </button>
   <button type="button" bitMenuItem (click)="newMachineAccount()">
-    <i class="bwi bwi-fw bwi-wrench" aria-hidden="true"></i> Machine account
+    <i class="bwi bwi-fw bwi-wrench" aria-hidden="true"></i> {{ "machineAccount" | i18n }}
   </button>
 </bit-menu>

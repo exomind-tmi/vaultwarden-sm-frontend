@@ -12,6 +12,7 @@ import {
   FormFieldModule,
   InputModule,
 } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 
 import { MachineAccountService, MachineAccountView } from "./machine-account.service";
 
@@ -25,7 +26,15 @@ export interface MachineAccountDialogParams {
   selector: "sm-machine-account-dialog",
   standalone: true,
   templateUrl: "./machine-account-dialog.component.html",
-  imports: [CommonModule, ReactiveFormsModule, DialogModule, ButtonModule, FormFieldModule, InputModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    DialogModule,
+    ButtonModule,
+    FormFieldModule,
+    InputModule,
+    I18nPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MachineAccountDialogComponent {
@@ -34,7 +43,7 @@ export class MachineAccountDialogComponent {
   private readonly machineAccountService = inject(MachineAccountService);
 
   protected readonly editing = this.params.machineAccount != null;
-  protected readonly title = this.editing ? "Edit machine account" : "New machine account";
+  protected readonly titleKey = this.editing ? "editMachineAccount" : "newMachineAccount";
   protected readonly saving = signal(false);
   protected readonly failed = signal(false);
   protected readonly name = new FormControl(this.params.machineAccount?.name ?? "", {
@@ -70,8 +79,4 @@ export class MachineAccountDialogComponent {
 export const openMachineAccountDialog = (
   dialogService: DialogService,
   config: DialogConfig<MachineAccountDialogParams>,
-) =>
-  dialogService.open<string, MachineAccountDialogParams>(
-    MachineAccountDialogComponent,
-    config,
-  );
+) => dialogService.open<string, MachineAccountDialogParams>(MachineAccountDialogComponent, config);

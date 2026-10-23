@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
+import { I18nPipe } from "@bitwarden/ui-common";
+
 import { AccessEditorComponent } from "./access-editor.component";
 import { AccessPolicyService } from "./access-policy.service";
 import { routeParams } from "./sm-route-params";
@@ -10,14 +12,15 @@ import { routeParams } from "./sm-route-params";
   selector: "sm-machine-account-projects",
   standalone: true,
   template: `<sm-access-editor
-    hint="Grant this machine account access to projects."
-    emptyMessage="This machine account is not granted any projects."
+    [hint]="'machineAccountProjectsDescription' | i18n"
+    [emptyMessage]="'serviceAccountEmptyProjectAccesspolicies' | i18n"
+    [savedMessage]="'machineAccountAccessUpdated' | i18n"
     writeMode="choice"
     [load]="load"
     [listGrantees]="listGrantees"
     [save]="save"
   ></sm-access-editor>`,
-  imports: [AccessEditorComponent],
+  imports: [AccessEditorComponent, I18nPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MachineAccountProjectsComponent {

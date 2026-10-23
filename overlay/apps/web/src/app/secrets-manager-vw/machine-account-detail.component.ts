@@ -3,12 +3,18 @@ import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/cor
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { lastValueFrom } from "rxjs";
 
-import { BreadcrumbsModule, ButtonModule, DialogService, TabsModule, ToastService } from "@bitwarden/components";
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
+import {
+  BreadcrumbsModule,
+  ButtonModule,
+  DialogService,
+  TabsModule,
+  ToastService,
+} from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
-import {
-  openMachineAccountDialog,
-} from "./machine-account-dialog.component";
+import { openMachineAccountDialog } from "./machine-account-dialog.component";
 import { MachineAccountService } from "./machine-account.service";
 import { SmNewMenuComponent } from "./sm-new-menu.component";
 
@@ -25,6 +31,7 @@ import { SmNewMenuComponent } from "./sm-new-menu.component";
     TabsModule,
     ButtonModule,
     SmNewMenuComponent,
+    I18nPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,6 +40,7 @@ export class MachineAccountDetailComponent {
   private readonly machineAccountService = inject(MachineAccountService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
+  private readonly i18nService = inject(I18nService);
 
   protected readonly organizationId = this.route.snapshot.params.organizationId as string;
   protected readonly machineAccountId = this.route.snapshot.params.machineAccountId as string;
@@ -62,7 +70,10 @@ export class MachineAccountDetailComponent {
       data: { organizationId: this.organizationId, machineAccount },
     });
     if (await lastValueFrom(dialogRef.closed)) {
-      this.toastService.showToast({ variant: "success", message: "Machine account saved." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("machineAccountUpdated"),
+      });
       await this.loadName();
     }
   }

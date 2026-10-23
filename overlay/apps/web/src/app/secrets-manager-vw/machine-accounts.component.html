@@ -1,15 +1,15 @@
-<app-header title="Machine accounts">
+<app-header [title]="'machineAccounts' | i18n">
   <bit-search
     ngModel
     (ngModelChange)="dataSource.filter = $event"
-    placeholder="Search machine accounts"
+    [placeholder]="'searchMachineAccounts' | i18n"
     class="tw-w-80"
   ></bit-search>
   <sm-new-menu></sm-new-menu>
 </app-header>
 
 <div class="tw-p-6">
-  <p *ngIf="failed()" class="tw-text-danger">Failed to load machine accounts.</p>
+  <p *ngIf="failed()" class="tw-text-danger">{{ "smLoadFailed" | i18n }}</p>
 
   <div *ngIf="loading()" class="tw-pt-16 tw-text-center tw-text-muted">
     <i class="bwi bwi-spinner bwi-spin bwi-2x" aria-hidden="true"></i>
@@ -20,14 +20,16 @@
       *ngIf="!hasMachineAccounts"
       class="tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-12 tw-text-center tw-text-muted"
     >
-      No machine accounts yet. Create one to issue access tokens for automation.
+      {{ "machineAccountsNoItemsMessage" | i18n }}
     </div>
 
     <bit-table *ngIf="hasMachineAccounts" [dataSource]="dataSource">
       <ng-container header>
         <tr>
-          <th bitCell bitSortable="name" default>Name</th>
-          <th bitCell bitSortable="revisionDate" class="tw-whitespace-nowrap">Last edited</th>
+          <th bitCell bitSortable="name" default>{{ "name" | i18n }}</th>
+          <th bitCell bitSortable="revisionDate" class="tw-whitespace-nowrap">
+            {{ "lastEdited" | i18n }}
+          </th>
           <th bitCell class="tw-w-0"></th>
         </tr>
       </ng-container>
@@ -49,7 +51,7 @@
                     bitIconButton="bwi-clone"
                     buttonType="primaryGhost"
                     size="small"
-                    title="Copy machine account ID"
+                    [title]="'copyUuid' | i18n"
                     (click)="copyId(machineAccount.id)"
                   ></button>
                 </div>
@@ -65,7 +67,7 @@
               bitIconButton="bwi-ellipsis-v"
               buttonType="primaryGhost"
               [bitMenuTriggerFor]="maMenu"
-              title="Options"
+              [title]="'options' | i18n"
             ></button>
           </td>
           <bit-menu #maMenu>
@@ -73,13 +75,16 @@
               bitMenuItem
               [routerLink]="['/sm', organizationId, 'machine-accounts', machineAccount.id]"
             >
-              <i class="bwi bwi-fw bwi-eye" aria-hidden="true"></i> View machine account
+              <i class="bwi bwi-fw bwi-eye" aria-hidden="true"></i>
+              {{ "viewMachineAccount" | i18n }}
             </a>
             <button type="button" bitMenuItem (click)="edit(machineAccount)">
-              <i class="bwi bwi-fw bwi-pencil" aria-hidden="true"></i> Edit machine account
+              <i class="bwi bwi-fw bwi-pencil" aria-hidden="true"></i>
+              {{ "editMachineAccount" | i18n }}
             </button>
             <button type="button" bitMenuItem variant="danger" (click)="remove(machineAccount)">
-              <i class="bwi bwi-fw bwi-trash" aria-hidden="true"></i> Delete machine account
+              <i class="bwi bwi-fw bwi-trash" aria-hidden="true"></i>
+              {{ "deleteMachineAccount" | i18n }}
             </button>
           </bit-menu>
         </tr>

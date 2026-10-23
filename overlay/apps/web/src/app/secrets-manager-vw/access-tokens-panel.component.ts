@@ -2,7 +2,9 @@ import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from "@angular/core";
 import { FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
 
+import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { ButtonModule, IconButtonModule, InputModule, ToastService } from "@bitwarden/components";
+import { I18nPipe } from "@bitwarden/ui-common";
 
 import { AccessTokenView, MachineAccountService } from "./machine-account.service";
 
@@ -14,7 +16,14 @@ import { AccessTokenView, MachineAccountService } from "./machine-account.servic
   selector: "sm-access-tokens-panel",
   standalone: true,
   templateUrl: "./access-tokens-panel.component.html",
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, IconButtonModule, InputModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    IconButtonModule,
+    InputModule,
+    I18nPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccessTokensPanelComponent implements OnInit {
@@ -23,6 +32,7 @@ export class AccessTokensPanelComponent implements OnInit {
 
   private readonly machineAccountService = inject(MachineAccountService);
   private readonly toastService = inject(ToastService);
+  private readonly i18nService = inject(I18nService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
@@ -71,7 +81,10 @@ export class AccessTokensPanelComponent implements OnInit {
       this.name.reset("");
       await this.refresh();
     } catch {
-      this.toastService.showToast({ variant: "error", message: "Failed to create access token." });
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("errorOccurred"),
+      });
     } finally {
       this.creating.set(false);
     }
@@ -83,7 +96,10 @@ export class AccessTokensPanelComponent implements OnInit {
       return;
     }
     await navigator.clipboard.writeText(token);
-    this.toastService.showToast({ variant: "success", message: "Access token copied." });
+    this.toastService.showToast({
+      variant: "success",
+      message: this.i18nService.t("valueCopied", this.i18nService.t("accessToken")),
+    });
   }
 
   protected dismissNewToken(): void {
@@ -93,9 +109,15 @@ export class AccessTokensPanelComponent implements OnInit {
   protected async revoke(token: AccessTokenView): Promise<void> {
     try {
       await this.machineAccountService.revokeToken(this.machineAccountId, token.id);
-      this.toastService.showToast({ variant: "success", message: "Access token revoked." });
+      this.toastService.showToast({
+        variant: "success",
+        message: this.i18nService.t("accessTokenRevoked"),
+      });
     } catch {
-      this.toastService.showToast({ variant: "error", message: "Failed to revoke access token." });
+      this.toastService.showToast({
+        variant: "error",
+        message: this.i18nService.t("errorOccurred"),
+      });
     }
     await this.refresh();
   }
