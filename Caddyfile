@@ -14,7 +14,9 @@
 	}
 
 	# Base vault traffic -> the companion vaultwarden (its API, login, notifications, icons, …).
-	@base path /api/* /identity/* /notifications/* /icons/* /attachments/* /events/*
+	# `/admin` is vaultwarden's own admin panel (served by the backend when ADMIN_TOKEN is set); it
+	# is not part of the web vault SPA, so it must be proxied too rather than fall through to static.
+	@base path /api/* /identity/* /notifications/* /icons/* /attachments/* /events/* /admin /admin/*
 	handle @base {
 		reverse_proxy {$VAULTWARDEN_URL:http://vaultwarden:80}
 	}
