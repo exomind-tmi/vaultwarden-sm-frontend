@@ -1,0 +1,90 @@
+<div *ngIf="loading()" class="tw-pt-16 tw-text-center tw-text-muted">
+  <i class="bwi bwi-spinner bwi-spin bwi-2x" aria-hidden="true"></i>
+</div>
+
+<p *ngIf="failed()" class="tw-text-danger">Failed to load access policies.</p>
+
+<div *ngIf="!loading() && !failed()" class="tw-max-w-3xl">
+  <p class="tw-mt-6 tw-text-muted">{{ hint }}</p>
+
+  <!-- Add a grantee. -->
+  <div class="tw-mb-5 tw-flex tw-items-end tw-gap-3">
+    <div class="tw-flex-1">
+      <label for="access-add" class="tw-mb-1 tw-block tw-text-sm tw-font-semibold tw-text-main">
+        Add
+      </label>
+      <select
+        id="access-add"
+        bitInput
+        class="tw-w-full"
+        [value]="selection()"
+        [disabled]="available().length === 0"
+        (change)="select($event)"
+      >
+        <option value="">-- Type to filter --</option>
+        <option *ngFor="let g of available()" [value]="g.id">{{ g.name }}</option>
+      </select>
+    </div>
+    <button type="button" bitButton buttonType="secondary" [disabled]="!selection()" (click)="add()">
+      Add
+    </button>
+  </div>
+
+  <div
+    *ngIf="dataSource.data.length === 0"
+    class="tw-rounded tw-border tw-border-dashed tw-border-secondary-300 tw-p-6 tw-text-center tw-text-sm tw-text-muted"
+  >
+    {{ emptyMessage }}
+  </div>
+
+  <bit-table *ngIf="dataSource.data.length > 0" [dataSource]="dataSource">
+    <ng-container header>
+      <tr>
+        <th bitCell>Name</th>
+        <th bitCell class="tw-w-64">Permissions</th>
+        <th bitCell class="tw-w-0"></th>
+      </tr>
+    </ng-container>
+    <ng-template body let-rows$>
+      <tr bitRow *ngFor="let row of rows$ | async">
+        <td bitCell>
+          {{ row.name }}
+          <span *ngIf="row.currentUser" class="tw-text-muted">(you)</span>
+        </td>
+        <td bitCell>
+          <span *ngIf="writeMode === 'forced'" class="tw-text-muted">Can read, write</span>
+          <select
+            *ngIf="writeMode === 'choice'"
+            bitInput
+            [value]="row.write ? 'rw' : 'r'"
+            (change)="setPermission(row.id, $any($event.target).value)"
+          >
+            <option value="r">Can read</option>
+            <option value="rw">Can read, write</option>
+          </select>
+        </td>
+        <td bitCell class="tw-text-right">
+          <button
+            type="button"
+            bitIconButton="bwi-close"
+            buttonType="primaryGhost"
+            size="small"
+            title="Remove"
+            (click)="remove(row.id)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </bit-table>
+
+  <button
+    type="button"
+    bitButton
+    buttonType="primary"
+    class="tw-mt-7"
+    [disabled]="saving()"
+    (click)="submit()"
+  >
+    Save
+  </button>
+</div>

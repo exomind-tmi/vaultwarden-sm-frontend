@@ -22,6 +22,26 @@ export const smRoutes: Routes = [
         path: "projects/:projectId",
         loadComponent: () =>
           import("./project-detail.component").then((m) => m.ProjectDetailComponent),
+        children: [
+          { path: "", pathMatch: "full", redirectTo: "secrets" },
+          {
+            path: "secrets",
+            loadComponent: () =>
+              import("./project-secrets.component").then((m) => m.ProjectSecretsComponent),
+          },
+          {
+            path: "people",
+            loadComponent: () =>
+              import("./project-people.component").then((m) => m.ProjectPeopleComponent),
+          },
+          {
+            path: "machine-accounts",
+            loadComponent: () =>
+              import("./project-machine-accounts.component").then(
+                (m) => m.ProjectMachineAccountsComponent,
+              ),
+          },
+        ],
       },
       {
         path: "secrets",
@@ -36,6 +56,30 @@ export const smRoutes: Routes = [
         path: "machine-accounts/:machineAccountId",
         loadComponent: () =>
           import("./machine-account-detail.component").then((m) => m.MachineAccountDetailComponent),
+        children: [
+          { path: "", pathMatch: "full", redirectTo: "access-tokens" },
+          {
+            path: "access-tokens",
+            loadComponent: () =>
+              import("./machine-account-tokens.component").then(
+                (m) => m.MachineAccountTokensComponent,
+              ),
+          },
+          {
+            path: "people",
+            loadComponent: () =>
+              import("./machine-account-people.component").then(
+                (m) => m.MachineAccountPeopleComponent,
+              ),
+          },
+          {
+            path: "projects",
+            loadComponent: () =>
+              import("./machine-account-projects.component").then(
+                (m) => m.MachineAccountProjectsComponent,
+              ),
+          },
+        ],
       },
     ],
   },
