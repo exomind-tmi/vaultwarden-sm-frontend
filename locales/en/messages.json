@@ -8,7 +8,7 @@
     "description": "Secrets Manager: secret dialog, the option for a secret that belongs to no project."
   },
   "smProjectAccessDescription": {
-    "message": "Grant people and machine accounts access to this project.",
+    "message": "Grant people or machine accounts access to this project.",
     "description": "Secrets Manager: hint on the project Access tab, which lists people and machine accounts together."
   },
   "smProjectAccessEmpty": {
