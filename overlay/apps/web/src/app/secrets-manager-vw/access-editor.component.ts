@@ -31,8 +31,8 @@ import { GranteeView, GrantRequest, GrantView } from "./access-policy.service";
 export type GranteeKind = "person" | "machineAccount" | "project";
 
 const KINDS: Record<GranteeKind, { icon: string; groupKey: string; order: number }> = {
-  person: { icon: "bwi-user", groupKey: "smUserAccounts", order: 0 },
-  machineAccount: { icon: "bwi-wrench", groupKey: "smComputerAccounts", order: 1 },
+  person: { icon: "bwi-user", groupKey: "users", order: 0 },
+  machineAccount: { icon: "bwi-wrench", groupKey: "machineAccounts", order: 1 },
   project: { icon: "bwi-collection", groupKey: "projects", order: 2 },
 };
 

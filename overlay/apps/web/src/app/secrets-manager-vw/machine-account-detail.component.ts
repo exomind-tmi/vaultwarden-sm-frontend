@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
-import { ActivatedRoute, RouterModule } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { lastValueFrom } from "rxjs";
 
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
@@ -37,12 +37,21 @@ import { SmNewMenuComponent } from "./sm-new-menu.component";
 })
 export class MachineAccountDetailComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly machineAccountService = inject(MachineAccountService);
   private readonly dialogService = inject(DialogService);
   private readonly toastService = inject(ToastService);
   private readonly i18nService = inject(I18nService);
 
   protected readonly organizationId = this.route.snapshot.params.organizationId as string;
+
+  /**
+   * The back breadcrumb navigates on click rather than by `route`: bit-breadcrumb treats a route
+   * that is a path prefix of the current URL as the active page and renders it as plain text.
+   */
+  protected back(): Promise<boolean> {
+    return this.router.navigate(["/sm", this.organizationId, "machine-accounts"]);
+  }
   protected readonly machineAccountId = this.route.snapshot.params.machineAccountId as string;
   protected readonly name = signal("");
 

@@ -1,6 +1,6 @@
 <app-header [title]="name()" icon="bwi-collection">
   <bit-breadcrumbs slot="breadcrumbs">
-    <bit-breadcrumb [route]="['/sm', organizationId, 'projects']" icon="bwi-angle-left">
+    <bit-breadcrumb (click)="back()" icon="bwi-angle-left">
       {{ "projects" | i18n }}
     </bit-breadcrumb>
   </bit-breadcrumbs>
