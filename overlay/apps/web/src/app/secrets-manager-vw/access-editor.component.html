@@ -7,49 +7,16 @@
 <div *ngIf="!loading() && !failed()" class="tw-max-w-3xl">
   <p class="tw-mt-6 tw-text-muted">{{ hint }}</p>
 
-  <!-- Add a grantee. -->
-  <div class="tw-mb-5 tw-flex tw-items-end tw-gap-3">
-    <div class="tw-flex-1">
-      <label for="access-add" class="tw-mb-1 tw-block tw-text-sm tw-font-semibold tw-text-main">
-        {{ "add" | i18n }}
-      </label>
-      <select
-        id="access-add"
-        bitInput
-        class="tw-w-full"
-        [value]="selection()"
-        [disabled]="nothingToAdd()"
-        (change)="select($event)"
-      >
-        <option value="">{{ "multiSelectPlaceholder" | i18n }}</option>
-        <!-- One group per grantee kind; a single kind needs no group heading. -->
-        <ng-container *ngFor="let group of available()">
-          <optgroup
-            *ngIf="available().length > 1; else plain"
-            [label]="kinds[group.kind].groupKey | i18n"
-          >
-            <option *ngFor="let g of group.grantees" [value]="rowKey(group.kind, g.id)">
-              {{ g.name }}
-            </option>
-          </optgroup>
-          <ng-template #plain>
-            <option *ngFor="let g of group.grantees" [value]="rowKey(group.kind, g.id)">
-              {{ g.name }}
-            </option>
-          </ng-template>
-        </ng-container>
-      </select>
-    </div>
-    <button
-      type="button"
-      bitButton
-      buttonType="secondary"
-      [disabled]="!selection()"
-      (click)="add()"
-    >
-      {{ "add" | i18n }}
-    </button>
-  </div>
+  <!-- Add grantees: picked items are added when the dropdown closes, as in the admin console. -->
+  <bit-form-field>
+    <bit-label>{{ "add" | i18n }}</bit-label>
+    <bit-multi-select
+      class="tw-w-full"
+      [baseItems]="available()"
+      [removeSelectedItems]="true"
+      (onItemsConfirmed)="add($event)"
+    />
+  </bit-form-field>
 
   <div
     *ngIf="dataSource.data.length === 0"
@@ -69,10 +36,7 @@
     <ng-template body let-rows$>
       <tr bitRow *ngFor="let row of rows$ | async">
         <td bitCell>
-          <i
-            class="bwi bwi-fw tw-mr-2 tw-text-muted {{ iconOf(row.kind) }}"
-            aria-hidden="true"
-          ></i>
+          <i class="bwi bwi-fw tw-mr-2 tw-text-muted {{ iconOf(row.kind) }}" aria-hidden="true"></i>
           {{ row.name }}
           <span *ngIf="row.currentUser" class="tw-text-muted"
             >({{ "selfOwnershipLabel" | i18n }})</span

@@ -12,7 +12,10 @@ import {
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import {
   ButtonModule,
+  FormFieldModule,
   IconButtonModule,
+  MultiSelectModule,
+  SelectItemView,
   TableDataSource,
   TableModule,
   ToastService,
@@ -56,7 +59,15 @@ interface Row extends GrantView {
   selector: "sm-access-editor",
   standalone: true,
   templateUrl: "./access-editor.component.html",
-  imports: [CommonModule, ButtonModule, IconButtonModule, TableModule, I18nPipe],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    FormFieldModule,
+    IconButtonModule,
+    MultiSelectModule,
+    TableModule,
+    I18nPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccessEditorComponent implements OnInit {
@@ -69,28 +80,29 @@ export class AccessEditorComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly i18nService = inject(I18nService);
 
-  protected readonly kinds = KINDS;
-  protected readonly rowKey = rowKey;
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
   protected readonly saving = signal(false);
-  protected readonly selection = signal("");
   protected readonly dataSource = new TableDataSource<Row>();
   private readonly rows = signal<Row[]>([]);
   /** The grants as last loaded or saved, per kind, so Save only replaces what changed. */
   private saved = new Map<GranteeKind, string>();
   private readonly grantees = signal<{ kind: GranteeKind; grantees: GranteeView[] }[]>([]);
-  /** Grantees not granted yet, grouped by kind for the picker. */
-  protected readonly available = computed(() =>
-    this.grantees().map(({ kind, grantees }) => ({
-      kind,
-      grantees: grantees
+  /** Grantees not granted yet, for the picker; grouped by kind when there is more than one. */
+  protected readonly available = computed<SelectItemView[]>(() =>
+    this.grantees().flatMap(({ kind, grantees }) =>
+      grantees
         .filter((g) => !this.rows().some((r) => r.key === rowKey(kind, g.id)))
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    })),
-  );
-  protected readonly nothingToAdd = computed(() =>
-    this.available().every((group) => group.grantees.length === 0),
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((g) => ({
+          id: rowKey(kind, g.id),
+          listName: g.name,
+          labelName: g.name,
+          icon: KINDS[kind].icon,
+          parentGrouping:
+            this.sources.length > 1 ? this.i18nService.t(KINDS[kind].groupKey) : undefined,
+        })),
+    ),
   );
 
   ngOnInit(): void {
@@ -138,23 +150,17 @@ export class AccessEditorComponent implements OnInit {
     return KINDS[kind].icon;
   }
 
-  protected select(event: Event): void {
-    this.selection.set((event.target as HTMLSelectElement).value);
-  }
-
-  protected add(): void {
-    const key = this.selection();
-    for (const { kind, grantees } of this.available()) {
-      const grantee = grantees.find((g) => rowKey(kind, g.id) === key);
-      if (grantee) {
-        const write = this.writeMode === "forced";
-        this.setRows([
-          ...this.rows(),
-          { id: grantee.id, name: grantee.name, read: true, write, currentUser: false, kind, key },
-        ]);
-      }
-    }
-    this.selection.set("");
+  protected add(items: SelectItemView[]): void {
+    const write = this.writeMode === "forced";
+    const added = this.grantees().flatMap(({ kind, grantees }) =>
+      grantees
+        .filter((g) => items.some((i) => i.id === rowKey(kind, g.id)))
+        .map((g) => {
+          const key = rowKey(kind, g.id);
+          return { id: g.id, name: g.name, read: true, write, currentUser: false, kind, key };
+        }),
+    );
+    this.setRows([...this.rows(), ...added]);
   }
 
   protected setPermission(key: string, value: string): void {
