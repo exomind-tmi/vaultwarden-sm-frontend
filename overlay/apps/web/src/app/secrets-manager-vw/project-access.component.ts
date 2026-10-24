@@ -13,6 +13,8 @@ import { routeParams } from "./sm-route-params";
   standalone: true,
   template: `<sm-access-editor
     [hint]="'smProjectAccessDescription' | i18n"
+    [label]="'smPeopleOrMachineAccounts' | i18n"
+    [selectHint]="'smProjectAccessSelectHint' | i18n"
     [emptyMessage]="'smProjectAccessEmpty' | i18n"
     [savedMessage]="'projectAccessUpdated' | i18n"
     [sources]="sources"

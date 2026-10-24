@@ -5,18 +5,31 @@
 <p *ngIf="failed()" class="tw-text-danger">{{ "smLoadFailed" | i18n }}</p>
 
 <div *ngIf="!loading() && !failed()" class="tw-max-w-3xl">
-  <p class="tw-mt-6 tw-text-muted">{{ hint }}</p>
+  <p class="tw-mt-6">{{ hint }}</p>
 
-  <!-- Add grantees: picked items are added when the dropdown closes, as in the admin console. -->
-  <bit-form-field>
-    <bit-label>{{ "add" | i18n }}</bit-label>
-    <bit-multi-select
-      class="tw-w-full"
-      [baseItems]="available()"
-      [removeSelectedItems]="true"
-      (onItemsConfirmed)="add($event)"
-    />
-  </bit-form-field>
+  <!-- Pick grantees (several at once, type to filter), then Add puts them in the list. -->
+  <div class="tw-flex tw-items-start tw-gap-3">
+    <bit-form-field class="tw-grow">
+      <bit-label>{{ label }}</bit-label>
+      <bit-multi-select
+        class="tw-w-full"
+        [baseItems]="available()"
+        [ngModel]="picked()"
+        (ngModelChange)="picked.set($event)"
+      />
+      <bit-hint>{{ selectHint }}</bit-hint>
+    </bit-form-field>
+    <button
+      type="button"
+      bitButton
+      buttonType="secondary"
+      class="tw-mt-7"
+      [disabled]="picked().length === 0"
+      (click)="add()"
+    >
+      {{ "add" | i18n }}
+    </button>
+  </div>
 
   <div
     *ngIf="dataSource.data.length === 0"
@@ -46,15 +59,17 @@
           <span *ngIf="writeMode === 'forced'" class="tw-text-muted">{{
             "canReadWrite" | i18n
           }}</span>
-          <select
-            *ngIf="writeMode === 'choice'"
-            bitInput
-            [value]="row.write ? 'rw' : 'r'"
-            (change)="setPermission(row.key, $any($event.target).value)"
-          >
-            <option value="r">{{ "canRead" | i18n }}</option>
-            <option value="rw">{{ "canReadWrite" | i18n }}</option>
-          </select>
+          <bit-form-field *ngIf="writeMode === 'choice'" disableMargin>
+            <bit-select
+              bitInput
+              [ngModel]="row.write"
+              (ngModelChange)="setPermission(row.key, $event)"
+              appA11yTitle="{{ row.name }} {{ 'permissions' | i18n }}"
+            >
+              <bit-option [value]="false" [label]="'canRead' | i18n" />
+              <bit-option [value]="true" [label]="'canReadWrite' | i18n" />
+            </bit-select>
+          </bit-form-field>
         </td>
         <td bitCell class="tw-text-right">
           <button

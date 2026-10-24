@@ -8,11 +8,23 @@
     "description": "Secrets Manager: secret dialog, the option for a secret that belongs to no project."
   },
   "smProjectAccessDescription": {
-    "message": "Grant people or machine accounts access to this project.",
+    "message": "Grant user or computer accounts access to this project.",
     "description": "Secrets Manager: hint on the project Access tab, which lists people and machine accounts together."
   },
   "smProjectAccessEmpty": {
-    "message": "Add people or machine accounts to grant access",
+    "message": "Add user or computer accounts to grant access",
     "description": "Secrets Manager: project Access tab when nobody has access yet."
+  },
+  "smPeopleOrMachineAccounts": {
+    "message": "User or computer accounts",
+    "description": "Secrets Manager: label of the project Access picker."
+  },
+  "smProjectAccessSelectHint": {
+    "message": "Type or select user or computer accounts",
+    "description": "Secrets Manager: help text under the project Access picker."
+  },
+  "smPeopleSelectHint": {
+    "message": "Type or select people",
+    "description": "Secrets Manager: help text under the machine account Access picker."
   }
 }

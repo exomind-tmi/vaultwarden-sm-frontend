@@ -8,14 +8,17 @@ import {
   OnInit,
   signal,
 } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import {
+  A11yTitleDirective,
   ButtonModule,
   FormFieldModule,
   IconButtonModule,
   MultiSelectModule,
   SelectItemView,
+  SelectModule,
   TableDataSource,
   TableModule,
   ToastService,
@@ -50,7 +53,7 @@ interface Row extends GrantView {
 
 /**
  * Save-based access editor for one object (a project, a machine account): all its grants in one
- * list, whatever the grantee kind. A grantee is picked and added, its permission is chosen per row,
+ * list, whatever the grantee kind. Grantees are picked and added, a permission is chosen per row,
  * and Save replaces the grants of every kind that changed — one PUT per kind, as the API is split
  * by grantee kind. `writeMode` "forced" means every grant is read + write (people on a machine
  * account), so the permission is fixed.
@@ -61,10 +64,13 @@ interface Row extends GrantView {
   templateUrl: "./access-editor.component.html",
   imports: [
     CommonModule,
+    FormsModule,
+    A11yTitleDirective,
     ButtonModule,
     FormFieldModule,
     IconButtonModule,
     MultiSelectModule,
+    SelectModule,
     TableModule,
     I18nPipe,
   ],
@@ -72,6 +78,9 @@ interface Row extends GrantView {
 })
 export class AccessEditorComponent implements OnInit {
   @Input({ required: true }) hint!: string;
+  /** The picker's label and help text, naming the kinds it offers. */
+  @Input({ required: true }) label!: string;
+  @Input({ required: true }) selectHint!: string;
   @Input({ required: true }) emptyMessage!: string;
   @Input({ required: true }) savedMessage!: string;
   @Input({ required: true }) sources!: AccessSource[];
@@ -84,6 +93,7 @@ export class AccessEditorComponent implements OnInit {
   protected readonly failed = signal(false);
   protected readonly saving = signal(false);
   protected readonly dataSource = new TableDataSource<Row>();
+  protected readonly picked = signal<SelectItemView[]>([]);
   private readonly rows = signal<Row[]>([]);
   /** The grants as last loaded or saved, per kind, so Save only replaces what changed. */
   private saved = new Map<GranteeKind, string>();
@@ -150,21 +160,22 @@ export class AccessEditorComponent implements OnInit {
     return KINDS[kind].icon;
   }
 
-  protected add(items: SelectItemView[]): void {
+  protected add(): void {
+    const picked = new Set(this.picked().map((i) => i.id));
     const write = this.writeMode === "forced";
     const added = this.grantees().flatMap(({ kind, grantees }) =>
       grantees
-        .filter((g) => items.some((i) => i.id === rowKey(kind, g.id)))
+        .filter((g) => picked.has(rowKey(kind, g.id)))
         .map((g) => {
           const key = rowKey(kind, g.id);
           return { id: g.id, name: g.name, read: true, write, currentUser: false, kind, key };
         }),
     );
     this.setRows([...this.rows(), ...added]);
+    this.picked.set([]);
   }
 
-  protected setPermission(key: string, value: string): void {
-    const write = value === "rw";
+  protected setPermission(key: string, write: boolean): void {
     this.setRows(this.rows().map((r) => (r.key === key ? { ...r, write } : r)));
   }
 
