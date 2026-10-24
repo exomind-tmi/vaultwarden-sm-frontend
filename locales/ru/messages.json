@@ -19,5 +19,11 @@
   },
   "smPeopleSelectHint": {
     "message": "Введите или выберите людей"
+  },
+  "smUserAccounts": {
+    "message": "Аккаунты пользователей"
+  },
+  "smComputerAccounts": {
+    "message": "Аккаунты компьютеров"
   }
 }

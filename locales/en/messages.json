@@ -26,5 +26,13 @@
   "smPeopleSelectHint": {
     "message": "Type or select people",
     "description": "Secrets Manager: help text under the machine account Access picker."
+  },
+  "smUserAccounts": {
+    "message": "User accounts",
+    "description": "Secrets Manager: access picker group of organization members."
+  },
+  "smComputerAccounts": {
+    "message": "Computer accounts",
+    "description": "Secrets Manager: access picker group of machine accounts."
   }
 }
