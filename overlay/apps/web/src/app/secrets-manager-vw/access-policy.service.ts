@@ -30,7 +30,8 @@ export interface GrantView {
   currentUser: boolean;
 }
 
-interface GrantRequest {
+/** A grant as written back: the grantee and its rights. */
+export interface GrantRequest {
   id: string;
   read: boolean;
   write: boolean;

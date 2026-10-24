@@ -31,16 +31,9 @@ export const smRoutes: Routes = [
               import("./project-secrets.component").then((m) => m.ProjectSecretsComponent),
           },
           {
-            path: "people",
+            path: "access",
             loadComponent: () =>
-              import("./project-people.component").then((m) => m.ProjectPeopleComponent),
-          },
-          {
-            path: "machine-accounts",
-            loadComponent: () =>
-              import("./project-machine-accounts.component").then(
-                (m) => m.ProjectMachineAccountsComponent,
-              ),
+              import("./project-access.component").then((m) => m.ProjectAccessComponent),
           },
         ],
       },
@@ -67,10 +60,10 @@ export const smRoutes: Routes = [
               ),
           },
           {
-            path: "people",
+            path: "access",
             loadComponent: () =>
-              import("./machine-account-people.component").then(
-                (m) => m.MachineAccountPeopleComponent,
+              import("./machine-account-access.component").then(
+                (m) => m.MachineAccountAccessComponent,
               ),
           },
           {

@@ -6,8 +6,7 @@
   </bit-breadcrumbs>
   <bit-tab-nav-bar [label]="'project' | i18n" slot="tabs">
     <bit-tab-link [route]="['secrets']">{{ "secrets" | i18n }}</bit-tab-link>
-    <bit-tab-link [route]="['people']">{{ "people" | i18n }}</bit-tab-link>
-    <bit-tab-link [route]="['machine-accounts']">{{ "machineAccounts" | i18n }}</bit-tab-link>
+    <bit-tab-link [route]="['access']">{{ "smAccess" | i18n }}</bit-tab-link>
   </bit-tab-nav-bar>
   <button slot="secondary" type="button" bitButton buttonType="secondary" (click)="edit()">
     {{ "editProject" | i18n }}

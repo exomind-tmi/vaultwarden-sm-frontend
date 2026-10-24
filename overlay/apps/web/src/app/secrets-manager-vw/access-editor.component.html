@@ -18,11 +18,26 @@
         bitInput
         class="tw-w-full"
         [value]="selection()"
-        [disabled]="available().length === 0"
+        [disabled]="nothingToAdd()"
         (change)="select($event)"
       >
         <option value="">{{ "multiSelectPlaceholder" | i18n }}</option>
-        <option *ngFor="let g of available()" [value]="g.id">{{ g.name }}</option>
+        <!-- One group per grantee kind; a single kind needs no group heading. -->
+        <ng-container *ngFor="let group of available()">
+          <optgroup
+            *ngIf="available().length > 1; else plain"
+            [label]="kinds[group.kind].groupKey | i18n"
+          >
+            <option *ngFor="let g of group.grantees" [value]="rowKey(group.kind, g.id)">
+              {{ g.name }}
+            </option>
+          </optgroup>
+          <ng-template #plain>
+            <option *ngFor="let g of group.grantees" [value]="rowKey(group.kind, g.id)">
+              {{ g.name }}
+            </option>
+          </ng-template>
+        </ng-container>
       </select>
     </div>
     <button
@@ -54,6 +69,10 @@
     <ng-template body let-rows$>
       <tr bitRow *ngFor="let row of rows$ | async">
         <td bitCell>
+          <i
+            class="bwi bwi-fw tw-mr-2 tw-text-muted {{ iconOf(row.kind) }}"
+            aria-hidden="true"
+          ></i>
           {{ row.name }}
           <span *ngIf="row.currentUser" class="tw-text-muted"
             >({{ "selfOwnershipLabel" | i18n }})</span
@@ -67,7 +86,7 @@
             *ngIf="writeMode === 'choice'"
             bitInput
             [value]="row.write ? 'rw' : 'r'"
-            (change)="setPermission(row.id, $any($event.target).value)"
+            (change)="setPermission(row.key, $any($event.target).value)"
           >
             <option value="r">{{ "canRead" | i18n }}</option>
             <option value="rw">{{ "canReadWrite" | i18n }}</option>
@@ -80,7 +99,7 @@
             buttonType="primaryGhost"
             size="small"
             [title]="'remove' | i18n"
-            (click)="remove(row.id)"
+            (click)="remove(row.key)"
           ></button>
         </td>
       </tr>
