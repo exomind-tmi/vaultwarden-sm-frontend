@@ -1,0 +1,167 @@
+{
+  "unknownServiceAccount": {
+    "message": "Неизвестный сервисный аккаунт, возможно, вам потребуется запросить разрешение на доступ к этому сервисному аккаунту."
+  },
+  "nameUnavailableServiceAccountDeleted": {
+    "message": "Удален сервисный аккаунт Id: $SERVICE_ACCOUNT_ID$"
+  },
+  "addedUserToServiceAccountWithId": {
+    "message": "Добавлен пользователь: $USER_ID$ в сервисный аккаунт с идентификатором: $SERVICE_ACCOUNT_ID$"
+  },
+  "removedUserToServiceAccountWithId": {
+    "message": "Удален пользователь: $USER_ID$ из сервисного аккаунта с идентификатором: $SERVICE_ACCOUNT_ID$"
+  },
+  "removedGroupFromServiceAccountWithId": {
+    "message": "Удалена группа: $GROUP_ID$ из сервисного аккаунта с идентификатором: $SERVICE_ACCOUNT_ID$"
+  },
+  "serviceAccountCreatedWithId": {
+    "message": "Создан сервисный аккаунт с идентификатором: $SERVICE_ACCOUNT_ID$"
+  },
+  "addedGroupToServiceAccountId": {
+    "message": "Добавлена группа: $GROUP_ID$ в сервисный аккаунт с идентификатором: $SERVICE_ACCOUNT_ID$"
+  },
+  "serviceAccountDeletedWithId": {
+    "message": "Удален сервисный аккаунт с идентификатором: $SERVICE_ACCOUNT_ID$"
+  },
+  "smOnboardingCreateMachineAccountCta": {
+    "message": "Создать сервисный аккаунт"
+  },
+  "machineAccountsCannotCreate": {
+    "message": "Сервисные аккаунты не могут быть созданы в отключенных организациях. Обратитесь за помощью к владельцу организации."
+  },
+  "machineAccount": {
+    "message": "Сервисный аккаунт"
+  },
+  "machineAccounts": {
+    "message": "Сервисные аккаунты"
+  },
+  "newMachineAccount": {
+    "message": "Новый сервисный аккаунт"
+  },
+  "addMachineAccount": {
+    "message": "Добавить сервисный аккаунт"
+  },
+  "machineAccountsNoItemsMessage": {
+    "message": "Чтобы приступить к автоматизации секретного доступа, создайте новый сервисный аккаунт."
+  },
+  "deleteMachineAccounts": {
+    "message": "Удалить сервисные аккаунты"
+  },
+  "deleteMachineAccount": {
+    "message": "Удалить сервисный аккаунт"
+  },
+  "viewMachineAccount": {
+    "message": "Просмотр сервисного аккаунта"
+  },
+  "deleteMachineAccountDialogMessage": {
+    "message": "Удаление сервисного аккаунта $MACHINE_ACCOUNT$ окончательно и необратимо."
+  },
+  "deleteMachineAccountsDialogMessage": {
+    "message": "Удаление сервисных аккаунтов окончательно и необратимо."
+  },
+  "deleteMachineAccountsConfirmMessage": {
+    "message": "Сервисных аккаунтов к удалению: $COUNT$"
+  },
+  "deleteMachineAccountToast": {
+    "message": "Сервисный аккаунт удален"
+  },
+  "deleteMachineAccountsToast": {
+    "message": "Сервисные аккаунты удалены"
+  },
+  "searchMachineAccounts": {
+    "message": "Поиск сервисных аккаунтов"
+  },
+  "editMachineAccount": {
+    "message": "Изменить сервисный аккаунт"
+  },
+  "machineAccountName": {
+    "message": "Название сервисного аккаунта"
+  },
+  "machineAccountCreated": {
+    "message": "Сервисный аккаунт создан"
+  },
+  "machineAccountUpdated": {
+    "message": "Сервисный аккаунт обновлен"
+  },
+  "projectMachineAccountsDescription": {
+    "message": "Предоставить сервисным аккаунтам доступ к этому проекту."
+  },
+  "projectMachineAccountsSelectHint": {
+    "message": "Введите или выберите сервисные аккаунты"
+  },
+  "projectEmptyMachineAccountAccessPolicies": {
+    "message": "Добавить сервисные аккаунты для предоставления доступа"
+  },
+  "machineAccountPeopleDescription": {
+    "message": "Предоставить группам или людям доступ к этому сервисному аккаунту."
+  },
+  "machineAccountProjectsDescription": {
+    "message": "Назначить проекты этому сервисному аккаунту. "
+  },
+  "createMachineAccount": {
+    "message": "Создать сервисный аккаунт"
+  },
+  "maPeopleWarningMessage": {
+    "message": "Удаление пользователей из сервисного аккаунта не приводит к удалению созданных ими токенов доступа. В целях обеспечения безопасности рекомендуется отзывать токены доступа, созданные пользователями, удаленными из сервисного аккаунта."
+  },
+  "smAccessRemovalWarningMaTitle": {
+    "message": "Удалить доступ к этому сервисному аккаунту"
+  },
+  "smAccessRemovalWarningMaMessage": {
+    "message": "Это действие лишит вас доступа к сервисному аккаунту."
+  },
+  "machineAccountsIncluded": {
+    "message": "Включено сервисных аккаунтов: $COUNT$"
+  },
+  "additionalMachineAccountCost": {
+    "message": "В месяц за дополнительные сервисные аккаунты: $COST$"
+  },
+  "additionalMachineAccounts": {
+    "message": "Дополнительные сервисные аккаунты"
+  },
+  "includedMachineAccounts": {
+    "message": "Ваш план включает в себя сервисных аккаунтов: $COUNT$"
+  },
+  "graceMachineAccounts": {
+    "message": "У вас есть $COUNT$ сервисных аккаунтов от предыдущего тарифа."
+  },
+  "addAdditionalMachineAccounts": {
+    "message": "Стоимость дополнительных сервисных аккаунтов за месяц: $COST$"
+  },
+  "limitMachineAccounts": {
+    "message": "Лимит сервисных аккаунтов (опционально)"
+  },
+  "limitMachineAccountsDesc": {
+    "message": "Установите лимит для сервисных аккаунтов. По достижении этого лимита создание новых сервисных аккаунтов будет невозможным."
+  },
+  "machineAccountLimit": {
+    "message": "Лимит сервисных аккаунтов (опционально)"
+  },
+  "maxMachineAccountCost": {
+    "message": "Максимальная потенциальная стоимость сервисного аккаунта"
+  },
+  "machineAccountAccessUpdated": {
+    "message": "Доступ сервисного аккаунта обновлен"
+  },
+  "secretMachineAccountsDescription": {
+    "message": "Предоставить сервисным аккаунтам доступ к этому секрету."
+  },
+  "secretMachineAccountsEmptyMessage": {
+    "message": "Добавить сервисные аккаунты для представления доступа к этому секрету"
+  },
+  "projectsAccessedByMachineAccount": {
+    "message": "С помощью этого сервисного аккаунта можно получить доступ к следующим проектам."
+  },
+  "UpTo50MachineAccounts": {
+    "message": "До 50 сервисных аккаунтов"
+  },
+  "UpTo20MachineAccounts": {
+    "message": "До 20 сервисных аккаунтов"
+  },
+  "additionalServiceAccountsV2": {
+    "message": "Дополнительные сервисные аккаунты"
+  },
+  "includedMachineAccountsV2": {
+    "message": "$COUNT$ сервисных аккаунтов"
+  }
+}
