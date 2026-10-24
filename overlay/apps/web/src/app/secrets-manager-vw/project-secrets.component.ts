@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute } from "@angular/router";
 import { lastValueFrom } from "rxjs";
 
@@ -18,6 +19,7 @@ import { I18nPipe } from "@bitwarden/ui-common";
 
 import { openSecretDialog } from "./secret-dialog.component";
 import { SecretListView, SecretService } from "./secret.service";
+import { SmEventsService } from "./sm-events.service";
 import { routeParams } from "./sm-route-params";
 
 /** The Secrets tab of a project: the secrets assigned to it. */
@@ -35,6 +37,7 @@ export class ProjectSecretsComponent {
   private readonly i18nService = inject(I18nService);
   private readonly platformUtilsService = inject(PlatformUtilsService);
   private readonly params = routeParams(inject(ActivatedRoute));
+  private readonly events = inject(SmEventsService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
@@ -42,6 +45,7 @@ export class ProjectSecretsComponent {
 
   constructor() {
     void this.refresh();
+    this.events.changed$.pipe(takeUntilDestroyed()).subscribe(() => void this.refresh());
   }
 
   protected get hasSecrets(): boolean {

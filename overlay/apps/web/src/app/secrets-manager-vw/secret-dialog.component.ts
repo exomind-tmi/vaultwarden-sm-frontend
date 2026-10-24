@@ -11,15 +11,24 @@ import {
   DialogService,
   FormFieldModule,
   InputModule,
+  SelectModule,
 } from "@bitwarden/components";
 import { I18nPipe } from "@bitwarden/ui-common";
 
 import { ProjectService, ProjectView } from "./project.service";
 import { SecretInput, SecretListView, SecretService } from "./secret.service";
 
+/** What the dialog closes with once saved: the secret and the project it now belongs to ("" if none). */
+export interface SecretDialogResult {
+  id: string;
+  projectId: string;
+}
+
 export interface SecretDialogParams {
   organizationId: string;
   secret?: SecretListView;
+  /** Project preselected for a new secret; empty for none. */
+  projectId?: string;
 }
 
 /** Create/edit dialog for a secret. The value and note are fetched for editing and encrypted on save. */
@@ -34,13 +43,14 @@ export interface SecretDialogParams {
     ButtonModule,
     FormFieldModule,
     InputModule,
+    SelectModule,
     I18nPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SecretDialogComponent {
   private readonly params = inject<SecretDialogParams>(DIALOG_DATA);
-  private readonly dialogRef = inject<DialogRef<string>>(DialogRef);
+  private readonly dialogRef = inject<DialogRef<SecretDialogResult>>(DialogRef);
   private readonly secretService = inject(SecretService);
   private readonly projectService = inject(ProjectService);
 
@@ -55,7 +65,7 @@ export class SecretDialogComponent {
     key: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
     value: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
     note: new FormControl("", { nonNullable: true }),
-    projectId: new FormControl("", { nonNullable: true }),
+    projectId: new FormControl(this.params.projectId ?? "", { nonNullable: true }),
   });
 
   constructor() {
@@ -109,7 +119,7 @@ export class SecretDialogComponent {
       } else {
         id = await this.secretService.create(this.params.organizationId, input);
       }
-      this.dialogRef.close(id);
+      this.dialogRef.close({ id, projectId: v.projectId });
     } catch {
       this.failed.set(true);
     } finally {
@@ -121,4 +131,4 @@ export class SecretDialogComponent {
 export const openSecretDialog = (
   dialogService: DialogService,
   config: DialogConfig<SecretDialogParams>,
-) => dialogService.open<string, SecretDialogParams>(SecretDialogComponent, config);
+) => dialogService.open<SecretDialogResult, SecretDialogParams>(SecretDialogComponent, config);
