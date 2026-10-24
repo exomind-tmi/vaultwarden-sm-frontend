@@ -10,6 +10,7 @@ import {
   ButtonModule,
   DialogService,
   IconButtonModule,
+  LinkModule,
   MenuModule,
   TableDataSource,
   TableModule,
@@ -27,7 +28,15 @@ import { routeParams } from "./sm-route-params";
   selector: "sm-project-secrets",
   standalone: true,
   templateUrl: "./project-secrets.component.html",
-  imports: [CommonModule, ButtonModule, IconButtonModule, MenuModule, TableModule, I18nPipe],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    IconButtonModule,
+    LinkModule,
+    MenuModule,
+    TableModule,
+    I18nPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectSecretsComponent {

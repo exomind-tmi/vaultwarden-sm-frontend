@@ -24,6 +24,8 @@ export interface SecretListView {
   projects: SecretProjectRef[];
   creationDate: string;
   revisionDate: string;
+  /** Whether the caller may change (and delete) the secret; otherwise it is read-only. */
+  write: boolean;
 }
 
 /** A single secret with its decrypted value and note. */
@@ -72,6 +74,7 @@ export class SecretService {
         projects: (s.projects ?? []).map((p: any) => ({ id: p.id, name: names.get(p.id) ?? "" })),
         creationDate: s.creationDate,
         revisionDate: s.revisionDate,
+        write: s.write === true,
       })),
     );
   }
@@ -92,6 +95,7 @@ export class SecretService {
       ),
       creationDate: s.creationDate,
       revisionDate: s.revisionDate,
+      write: s.write === true,
     };
   }
 

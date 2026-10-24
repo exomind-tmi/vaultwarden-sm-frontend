@@ -55,7 +55,13 @@ export class SecretDialogComponent {
   private readonly projectService = inject(ProjectService);
 
   protected readonly editing = this.params.secret != null;
-  protected readonly titleKey = this.editing ? "editSecret" : "newSecret";
+  /** An existing secret the caller may only read: shown, not saved. */
+  protected readonly readOnly = this.editing && !this.params.secret?.write;
+  protected readonly titleKey = this.readOnly
+    ? "viewSecret"
+    : this.editing
+      ? "editSecret"
+      : "newSecret";
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly failed = signal(false);
@@ -69,6 +75,9 @@ export class SecretDialogComponent {
   });
 
   constructor() {
+    if (this.readOnly) {
+      this.form.disable();
+    }
     void this.init();
   }
 
