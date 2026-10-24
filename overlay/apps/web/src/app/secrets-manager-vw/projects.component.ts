@@ -20,6 +20,7 @@ import {
 import { I18nPipe } from "@bitwarden/ui-common";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
+import { openDeleteDialog } from "./delete-dialog.component";
 import { openProjectDialog } from "./project-dialog.component";
 import { ProjectService, ProjectView } from "./project.service";
 import { SmEventsService } from "./sm-events.service";
@@ -103,12 +104,13 @@ export class ProjectsComponent {
   }
 
   protected async remove(project: ProjectView): Promise<void> {
-    const confirmed = await this.dialogService.openSimpleDialog({
-      title: { key: "deleteProject" },
-      content: { key: "deleteProjectDialogMessage", placeholders: [project.name] },
-      type: "warning",
-      acceptButtonText: { key: "delete" },
+    const ref = openDeleteDialog(this.dialogService, {
+      title: this.i18nService.t("deleteProject"),
+      name: project.name,
+      warning: this.i18nService.t("deleteProjectDialogMessage", project.name),
+      confirmPhrase: this.i18nService.t("deleteProjectConfirmMessage", project.name),
     });
+    const confirmed = await lastValueFrom(ref.closed);
     if (!confirmed) {
       return;
     }

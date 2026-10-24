@@ -1,0 +1,21 @@
+<form
+  [formGroup]="form"
+  [bitSubmit]="submit"
+  bit-dialog
+  [title]="params.title"
+  [subtitle]="params.name"
+>
+  <ng-container bitDialogContent>
+    <bit-callout type="warning" [title]="'warning' | i18n">{{ params.warning }}</bit-callout>
+    <bit-form-field>
+      <bit-label>{{ "deleteProjectInputLabel" | i18n: params.confirmPhrase }}</bit-label>
+      <input bitInput type="text" formControlName="confirm" />
+    </bit-form-field>
+  </ng-container>
+  <ng-container bitDialogFooter>
+    <button type="submit" bitButton bitFormButton buttonType="danger">{{ params.title }}</button>
+    <button type="button" bitButton buttonType="secondary" bitDialogClose>
+      {{ "cancel" | i18n }}
+    </button>
+  </ng-container>
+</form>

@@ -20,6 +20,7 @@ import {
 import { I18nPipe } from "@bitwarden/ui-common";
 import { HeaderModule } from "@bitwarden/web-vault/app/layouts/header/header.module";
 
+import { openDeleteDialog } from "./delete-dialog.component";
 import { openMachineAccountDialog } from "./machine-account-dialog.component";
 import { MachineAccountService, MachineAccountView } from "./machine-account.service";
 import { SmEventsService } from "./sm-events.service";
@@ -103,12 +104,13 @@ export class MachineAccountsComponent {
   }
 
   protected async remove(machineAccount: MachineAccountView): Promise<void> {
-    const confirmed = await this.dialogService.openSimpleDialog({
-      title: { key: "deleteMachineAccount" },
-      content: { key: "deleteMachineAccountDialogMessage", placeholders: [machineAccount.name] },
-      type: "warning",
-      acceptButtonText: { key: "delete" },
+    const ref = openDeleteDialog(this.dialogService, {
+      title: this.i18nService.t("deleteMachineAccount"),
+      name: machineAccount.name,
+      warning: this.i18nService.t("deleteMachineAccountDialogMessage", machineAccount.name),
+      confirmPhrase: this.i18nService.t("deleteProjectConfirmMessage", machineAccount.name),
     });
+    const confirmed = await lastValueFrom(ref.closed);
     if (!confirmed) {
       return;
     }
