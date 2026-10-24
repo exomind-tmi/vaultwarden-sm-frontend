@@ -15,9 +15,13 @@
 
 	# Base vault traffic -> the companion vaultwarden (its API, login, notifications, icons, …).
 	# `/admin` is vaultwarden's own admin panel (served by the backend when ADMIN_TOKEN is set), and
-	# `/vw_static/*` is the admin panel's own CSS/JS/images; neither is part of the web vault SPA, so
-	# both must be proxied rather than fall through to the static file server.
-	@base path /api/* /identity/* /notifications/* /icons/* /attachments/* /events/* /admin /admin/* /vw_static/*
+	# `/vw_static/*` is the admin panel's own CSS/JS/images. The rest are files vaultwarden renders
+	# itself rather than serves from the web vault folder: `/css/vaultwarden.css` (its UI tweaks,
+	# e.g. hiding the SSO email field on the login page), `/app-id.json` and
+	# `/.well-known/apple-app-site-association` (FIDO / iOS app trust), and the `/alive` healthcheck.
+	# None is part of the web vault build, so all must be proxied rather than fall through to the
+	# static file server.
+	@base path /api/* /identity/* /notifications/* /icons/* /attachments/* /events/* /admin /admin/* /vw_static/* /css/vaultwarden.css /app-id.json /.well-known/apple-app-site-association /alive
 	handle @base {
 		reverse_proxy {$VAULTWARDEN_URL:http://vaultwarden:80}
 	}
