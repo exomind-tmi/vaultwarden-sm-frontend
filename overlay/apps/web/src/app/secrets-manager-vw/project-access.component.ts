@@ -3,7 +3,7 @@ import { ActivatedRoute } from "@angular/router";
 
 import { I18nPipe } from "@bitwarden/ui-common";
 
-import { AccessEditorComponent, AccessSource } from "./access-editor.component";
+import { AccessEditorComponent, AccessSource, SelfRemovalWarning } from "./access-editor.component";
 import { AccessPolicyService } from "./access-policy.service";
 import { routeParams } from "./sm-route-params";
 
@@ -18,6 +18,7 @@ import { routeParams } from "./sm-route-params";
     [emptyMessage]="'smProjectAccessEmpty' | i18n"
     [savedMessage]="'projectAccessUpdated' | i18n"
     [sources]="sources"
+    [selfRemovalWarning]="selfRemovalWarning"
   ></sm-access-editor>`,
   imports: [AccessEditorComponent, I18nPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,11 @@ import { routeParams } from "./sm-route-params";
 export class ProjectAccessComponent {
   private readonly policyService = inject(AccessPolicyService);
   private readonly params = routeParams(inject(ActivatedRoute));
+
+  protected readonly selfRemovalWarning: SelfRemovalWarning = {
+    titleKey: "smAccessRemovalWarningProjectTitle",
+    messageKey: "smAccessRemovalWarningProjectMessage",
+  };
 
   protected readonly sources: AccessSource[] = [
     {

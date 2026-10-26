@@ -7,7 +7,7 @@
 <div *ngIf="!loading() && !failed()" class="tw-max-w-3xl">
   <p class="tw-mt-6">{{ hint }}</p>
 
-  <!-- Pick grantees (several at once, type to filter), then Add puts them in the list. -->
+  <!-- Pick grantees (several at once, type to filter) and their permission; Add grants at once. -->
   <div class="tw-flex tw-items-start tw-gap-3">
     <bit-form-field class="tw-grow">
       <bit-label>{{ label }}</bit-label>
@@ -18,6 +18,13 @@
         (ngModelChange)="picked.set($event)"
       />
       <bit-hint>{{ selectHint }}</bit-hint>
+    </bit-form-field>
+    <bit-form-field *ngIf="writeMode === 'choice'" class="tw-w-64 tw-shrink-0">
+      <bit-label>{{ "permissions" | i18n }}</bit-label>
+      <bit-select bitInput [ngModel]="addWrite()" (ngModelChange)="addWrite.set($event)">
+        <bit-option [value]="false" [label]="'canRead' | i18n" />
+        <bit-option [value]="true" [label]="'canReadWrite' | i18n" />
+      </bit-select>
     </bit-form-field>
     <button
       type="button"
@@ -63,7 +70,7 @@
             <bit-select
               bitInput
               [ngModel]="row.write"
-              (ngModelChange)="setPermission(row.key, $event)"
+              (ngModelChange)="setPermission(row, $event)"
               appA11yTitle="{{ row.name }} {{ 'permissions' | i18n }}"
             >
               <bit-option [value]="false" [label]="'canRead' | i18n" />
@@ -78,21 +85,10 @@
             buttonType="primaryGhost"
             size="small"
             [title]="'remove' | i18n"
-            (click)="remove(row.key)"
+            (click)="remove(row)"
           ></button>
         </td>
       </tr>
     </ng-template>
   </bit-table>
-
-  <button
-    type="button"
-    bitButton
-    buttonType="primary"
-    class="tw-mt-7"
-    [disabled]="saving()"
-    (click)="submit()"
-  >
-    {{ "save" | i18n }}
-  </button>
 </div>

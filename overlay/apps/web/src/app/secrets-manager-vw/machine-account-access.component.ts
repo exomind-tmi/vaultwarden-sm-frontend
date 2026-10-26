@@ -3,7 +3,7 @@ import { ActivatedRoute } from "@angular/router";
 
 import { I18nPipe } from "@bitwarden/ui-common";
 
-import { AccessEditorComponent, AccessSource } from "./access-editor.component";
+import { AccessEditorComponent, AccessSource, SelfRemovalWarning } from "./access-editor.component";
 import { AccessPolicyService } from "./access-policy.service";
 import { routeParams } from "./sm-route-params";
 
@@ -18,6 +18,7 @@ import { routeParams } from "./sm-route-params";
     [emptyMessage]="'projectEmptyPeopleAccessPolicies' | i18n"
     [savedMessage]="'machineAccountAccessUpdated' | i18n"
     [sources]="sources"
+    [selfRemovalWarning]="selfRemovalWarning"
     writeMode="forced"
   ></sm-access-editor>`,
   imports: [AccessEditorComponent, I18nPipe],
@@ -26,6 +27,11 @@ import { routeParams } from "./sm-route-params";
 export class MachineAccountAccessComponent {
   private readonly policyService = inject(AccessPolicyService);
   private readonly params = routeParams(inject(ActivatedRoute));
+
+  protected readonly selfRemovalWarning: SelfRemovalWarning = {
+    titleKey: "smAccessRemovalWarningMaTitle",
+    messageKey: "smAccessRemovalWarningMaMessage",
+  };
 
   protected readonly sources: AccessSource[] = [
     {

@@ -14,6 +14,7 @@ import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.servic
 import {
   A11yTitleDirective,
   ButtonModule,
+  DialogService,
   FormFieldModule,
   IconButtonModule,
   MultiSelectModule,
@@ -46,17 +47,24 @@ export interface AccessSource {
 
 export type AccessWriteMode = "choice" | "forced";
 
+/** i18n keys of the confirmation shown before the user removes their own access. */
+export interface SelfRemovalWarning {
+  titleKey: string;
+  messageKey: string;
+}
+
 interface Row extends GrantView {
   kind: GranteeKind;
   key: string;
 }
 
 /**
- * Save-based access editor for one object (a project, a machine account): all its grants in one
- * list, whatever the grantee kind. Grantees are picked and added, a permission is chosen per row,
- * and Save replaces the grants of every kind that changed — one PUT per kind, as the API is split
- * by grantee kind. `writeMode` "forced" means every grant is read + write (people on a machine
- * account), so the permission is fixed.
+ * Access editor for one object (a project, a machine account): all its grants in one list,
+ * whatever the grantee kind. Every change applies at once — adding grantees (with the permission
+ * chosen beside the picker), changing a row's permission, removing a row — by replacing the grants
+ * of that kind, as the API is split by grantee kind. Changes are sent one after another, and a
+ * failed one reloads what the server holds. `writeMode` "forced" means every grant is read + write
+ * (people on a machine account), so there is no permission to choose.
  */
 @Component({
   selector: "sm-access-editor",
@@ -85,19 +93,22 @@ export class AccessEditorComponent implements OnInit {
   @Input({ required: true }) savedMessage!: string;
   @Input({ required: true }) sources!: AccessSource[];
   @Input() writeMode: AccessWriteMode = "choice";
+  @Input() selfRemovalWarning?: SelfRemovalWarning;
 
   private readonly toastService = inject(ToastService);
+  private readonly dialogService = inject(DialogService);
   private readonly i18nService = inject(I18nService);
 
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
-  protected readonly saving = signal(false);
   protected readonly dataSource = new TableDataSource<Row>();
   protected readonly picked = signal<SelectItemView[]>([]);
+  /** The permission new grantees get when added. */
+  protected readonly addWrite = signal(false);
   private readonly rows = signal<Row[]>([]);
-  /** The grants as last loaded or saved, per kind, so Save only replaces what changed. */
-  private saved = new Map<GranteeKind, string>();
   private readonly grantees = signal<{ kind: GranteeKind; grantees: GranteeView[] }[]>([]);
+  /** Changes are applied strictly in order, so a quick second change never races the first. */
+  private queue: Promise<void> = Promise.resolve();
   /** Grantees not granted yet, for the picker; grouped by kind when there is more than one. */
   protected readonly available = computed<SelectItemView[]>(() =>
     this.grantees().flatMap(({ kind, grantees }) =>
@@ -147,7 +158,6 @@ export class AccessEditorComponent implements OnInit {
           }));
         }),
       );
-      this.saved = new Map(this.sources.map((s) => [s.kind, this.snapshot(s.kind)]));
     } catch {
       this.failed.set(true);
     } finally {
@@ -162,8 +172,8 @@ export class AccessEditorComponent implements OnInit {
 
   protected add(): void {
     const picked = new Set(this.picked().map((i) => i.id));
-    const write = this.writeMode === "forced";
-    const added = this.grantees().flatMap(({ kind, grantees }) =>
+    const write = this.writeMode === "forced" || this.addWrite();
+    const added: Row[] = this.grantees().flatMap(({ kind, grantees }) =>
       grantees
         .filter((g) => picked.has(rowKey(kind, g.id)))
         .map((g) => {
@@ -173,47 +183,53 @@ export class AccessEditorComponent implements OnInit {
     );
     this.setRows([...this.rows(), ...added]);
     this.picked.set([]);
+    this.apply(new Set(added.map((r) => r.kind)));
   }
 
-  protected setPermission(key: string, write: boolean): void {
-    this.setRows(this.rows().map((r) => (r.key === key ? { ...r, write } : r)));
+  protected setPermission(row: Row, write: boolean): void {
+    this.setRows(this.rows().map((r) => (r.key === row.key ? { ...r, write } : r)));
+    this.apply(new Set([row.kind]));
   }
 
-  protected remove(key: string): void {
-    this.setRows(this.rows().filter((r) => r.key !== key));
-  }
-
-  protected async submit(): Promise<void> {
-    this.saving.set(true);
-    try {
-      for (const source of this.sources) {
-        const current = this.snapshot(source.kind);
-        if (current !== this.saved.get(source.kind)) {
-          await source.save(this.grants(source.kind));
-          this.saved.set(source.kind, current);
-        }
-      }
-      this.toastService.showToast({ variant: "success", message: this.savedMessage });
-    } catch {
-      this.toastService.showToast({
-        variant: "error",
-        message: this.i18nService.t("errorOccurred"),
+  protected async remove(row: Row): Promise<void> {
+    if (row.currentUser && this.selfRemovalWarning) {
+      const confirmed = await this.dialogService.openSimpleDialog({
+        title: { key: this.selfRemovalWarning.titleKey },
+        content: { key: this.selfRemovalWarning.messageKey },
+        type: "warning",
+        acceptButtonText: { key: "remove" },
       });
-      // One kind may have been saved before another failed: show what the server now holds.
-      await this.refresh();
-    } finally {
-      this.saving.set(false);
+      if (!confirmed) {
+        return;
+      }
     }
+    this.setRows(this.rows().filter((r) => r.key !== row.key));
+    this.apply(new Set([row.kind]));
+  }
+
+  /** Replace the grants of the given kinds on the server, after any change still in flight. */
+  private apply(kinds: Set<GranteeKind>): void {
+    const sources = this.sources.filter((s) => kinds.has(s.kind));
+    this.queue = this.queue.then(async () => {
+      try {
+        for (const source of sources) {
+          await source.save(this.grants(source.kind));
+        }
+        this.toastService.showToast({ variant: "success", message: this.savedMessage });
+      } catch {
+        this.toastService.showToast({
+          variant: "error",
+          message: this.i18nService.t("errorOccurred"),
+        });
+        await this.refresh(); // show what the server actually holds
+      }
+    });
   }
 
   private grants(kind: GranteeKind): GrantRequest[] {
     return this.rows()
       .filter((r) => r.kind === kind)
       .map(({ id, read, write }) => ({ id, read, write }));
-  }
-
-  private snapshot(kind: GranteeKind): string {
-    return JSON.stringify(this.grants(kind).sort((a, b) => a.id.localeCompare(b.id)));
   }
 }
 
